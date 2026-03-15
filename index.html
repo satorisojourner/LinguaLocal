@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0e17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LinguaLocal">
+<meta name="description" content="Live like a local — Learn languages for real expat life">
+<title>LinguaLocal — Live like a local</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22LinguaLocal%22%2C%22short_name%22%3A%22LinguaLocal%22%2C%22description%22%3A%22Live%20like%20a%20local%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22theme_color%22%3A%22%230f0e17%22%2C%22background_color%22%3A%22%230f0e17%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20192%20192'%3E%3Crect%20width%3D'192'%20height%3D'192'%20rx%3D'40'%20fill%3D'%230f0e17'%2F%3E%3Ctext%20y%3D'.9em'%20font-size%3D'140'%20x%3D'20'%3E%F0%9F%8C%8D%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20rx%3D'100'%20fill%3D'%230f0e17'%2F%3E%3Ctext%20y%3D'.9em'%20font-size%3D'380'%20x%3D'55'%3E%F0%9F%8C%8D%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f0e17;
+  --surface: #1a1928;
+  --surface2: #252438;
+  --border: rgba(255,255,255,0.08);
+  --accent: #e8a045;
+  --accent2: #8b5cf6;
+  --text: #fffffe;
+  --text-muted: rgba(255,255,255,0.5);
+  --red: #e85d5d;
+  --green: #4ade80;
+  --radius: 16px;
+  --header-h: 60px;
+  --nav-h: calc(64px + env(safe-area-inset-bottom));
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
+h1,h2,h3,.num{font-family:'Playfair Display',serif}
+
+/* OFFLINE BANNER */
+#offline-banner{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
+  background:#b45309;color:#fff;text-align:center;padding:8px 16px;
+  font-size:13px;font-weight:500;
+}
+#offline-banner.visible{display:block}
+
+/* LAYOUT */
+#app{display:flex;flex-direction:column;height:100%;padding-top:var(--header-h)}
+header{
+  position:fixed;top:0;left:0;right:0;height:var(--header-h);
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;z-index:100;
+}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--accent)}
+.logo span{color:var(--text-muted);font-size:11px;display:block;font-family:'DM Sans',sans-serif;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;margin-top:-2px}
+#lang-select{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:8px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;
+  cursor:pointer;min-height:44px;
+}
+
+/* BOTTOM NAV */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  padding-bottom:env(safe-area-inset-bottom);z-index:100;
+  -webkit-overflow-scrolling:touch;
+}
+#bottom-nav::-webkit-scrollbar{display:none}
+.nav-btn{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;padding:10px 16px;min-width:64px;
+  border:none;background:none;color:var(--text-muted);font-size:10px;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:color 0.2s;
+  min-height:44px;
+}
+.nav-btn .icon{font-size:20px;line-height:1}
+.nav-btn.active{color:var(--accent)}
+.nav-btn:active{background:rgba(255,255,255,0.05)}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:var(--nav-h);-webkit-overflow-scrolling:touch}
+.screen{display:none;padding:16px;animation:fadeIn 0.2s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card-title{font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:10px}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.stat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--accent)}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* PROGRESS BAR */
+.progress-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.4s ease}
+
+/* SKILL BARS */
+.skill-bar-wrap{margin-bottom:10px}
+.skill-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.skill-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.skill-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
+
+/* TABS */
+.tab-bar{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-pill{
+  flex:0 0 auto;padding:8px 14px;border-radius:20px;border:1px solid var(--border);
+  background:none;color:var(--text-muted);font-size:13px;font-family:'DM Sans',sans-serif;
+  cursor:pointer;white-space:nowrap;min-height:36px;transition:all 0.15s;
+}
+.tab-pill.active{background:var(--accent);color:#0f0e17;border-color:var(--accent);font-weight:600}
+.tab-pill:active{transform:scale(0.96)}
+
+/* PHRASE CARD */
+.phrase-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:10px;
+}
+.phrase-native{font-size:20px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.phrase-roman{font-size:13px;color:var(--accent);margin-bottom:3px}
+.phrase-english{font-size:13px;color:var(--text-muted)}
+.phrase-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 16px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  min-height:44px;transition:all 0.15s;
+}
+.btn:active{transform:scale(0.97)}
+.btn-accent{background:var(--accent);color:#0f0e17}
+.btn-accent2{background:var(--accent2);color:#fff}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-red{background:var(--red);color:#fff}
+.btn-sm{padding:7px 12px;font-size:12px;min-height:36px;border-radius:8px}
+.btn-full{width:100%}
+
+/* INPUTS */
+.input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);padding:12px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;
+  font-size:15px;min-height:44px;outline:none;
+}
+.input:focus{border-color:var(--accent2)}
+textarea.input{resize:vertical;min-height:80px;padding:12px 14px}
+
+/* SPEAK SCREEN */
+.phrase-big{
+  font-family:'Playfair Display',serif;font-size:28px;font-weight:700;
+  text-align:center;line-height:1.3;margin-bottom:8px;
+}
+.phonetic{font-size:14px;color:var(--accent);text-align:center;margin-bottom:6px}
+.translation{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:20px}
+
+/* COACH */
+.chat-container{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.chat-bubble{max-width:82%;padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.5}
+.chat-bubble.coach{
+  background:var(--surface2);border:1px solid var(--border);align-self:flex-start;
+  border-bottom-left-radius:4px;
+}
+.chat-bubble.user{
+  background:var(--accent2);color:#fff;align-self:flex-end;
+  border-bottom-right-radius:4px;
+}
+.bubble-translation{font-size:11px;color:var(--text-muted);margin-top:5px;font-style:italic}
+.coach-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.coach-avatar{width:44px;height:44px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:22px}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px}
+
+/* CURRENCY */
+.rate-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.rate-positive{color:var(--green)}
+.rate-negative{color:var(--red)}
+.quick-amounts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.amount-btn{padding:8px 14px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;min-height:36px}
+.amount-btn:active{background:var(--surface);color:var(--accent)}
+
+/* VISUAL TRANSLATE */
+.img-preview{width:100%;border-radius:12px;object-fit:cover;max-height:240px;margin:10px 0}
+.camera-zone{
+  border:2px dashed var(--border);border-radius:14px;padding:32px 20px;
+  text-align:center;cursor:pointer;transition:border-color 0.2s;
+}
+.camera-zone:active{border-color:var(--accent)}
+
+/* ACHIEVEMENTS */
+.achievements{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.achievements::-webkit-scrollbar{display:none}
+.achievement{flex:0 0 auto;text-align:center;width:80px}
+.achievement-icon{width:56px;height:56px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 6px}
+.achievement.unlocked .achievement-icon{border-color:var(--accent);background:rgba(232,160,69,0.1)}
+.achievement-name{font-size:10px;color:var(--text-muted);line-height:1.3}
+
+/* STREAK */
+.streak-dots{display:flex;justify-content:space-between;gap:6px}
+.streak-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--text-muted)}
+.streak-dot{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px}
+.streak-dot.done{background:var(--accent);border-color:var(--accent);color:#0f0e17}
+.streak-dot.today{border-color:var(--accent)}
+
+/* HEATMAP */
+.heatmap{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;margin-top:8px}
+.heat-cell{aspect-ratio:1;border-radius:3px;background:var(--surface2)}
+.heat-1{background:rgba(232,160,69,0.25)}
+.heat-2{background:rgba(232,160,69,0.5)}
+.heat-3{background:rgba(232,160,69,0.75)}
+.heat-4{background:var(--accent)}
+
+/* EMERGENCY */
+.emergency-overlay{
+  position:fixed;inset:0;z-index:200;background:rgba(15,14,23,0.97);
+  overflow-y:auto;padding:20px 16px;display:none;
+}
+.emergency-overlay.open{display:block}
+.sos-btn{
+  position:fixed;bottom:calc(var(--nav-h) + 14px);right:16px;
+  width:56px;height:56px;border-radius:50%;background:var(--red);
+  border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;
+  z-index:99;box-shadow:0 4px 20px rgba(232,93,93,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;
+}
+.sos-btn:active{transform:scale(0.95)}
+
+/* CHAR KEYBOARD */
+.char-keyboard{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.char-key{
+  padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);font-size:16px;cursor:pointer;min-height:40px;min-width:40px;
+  text-align:center;font-family:'DM Sans',sans-serif;
+}
+.char-key:active{background:var(--surface);color:var(--accent)}
+
+/* TRANSLATE SCREEN */
+.lang-selectors{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.lang-selectors select{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;min-height:44px}
+.swap-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);width:44px;height:44px;border-radius:10px;cursor:pointer;font-size:18px;flex:0 0 44px;display:flex;align-items:center;justify-content:center}
+.swap-btn:active{background:var(--surface)}
+
+/* RECORDING */
+.record-btn{
+  width:72px;height:72px;border-radius:50%;background:var(--accent2);border:none;
+  color:#fff;font-size:28px;cursor:pointer;margin:0 auto;display:flex;
+  align-items:center;justify-content:center;transition:all 0.15s;
+}
+.record-btn.recording{background:var(--red);animation:pulse 1s infinite}
+.record-btn:active{transform:scale(0.95)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,93,93,0.5)}50%{box-shadow:0 0 0 14px rgba(232,93,93,0)}}
+
+/* SPINNER */
+.spinner{width:24px;height:24px;border:3px solid rgba(255,255,255,0.15);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULT CARD */
+.result-section{margin-bottom:10px}
+.result-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
+.result-text{font-size:15px;line-height:1.6}
+
+/* CANVAS WRAP */
+.chart-wrap{position:relative;height:180px;margin:8px 0}
+
+/* MILESTONES */
+.milestone{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.milestone-icon{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 40px}
+.milestone.done .milestone-icon{background:rgba(232,160,69,0.15);border:1px solid var(--accent)}
+
+/* SESSION HISTORY */
+.session-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.score-badge{background:var(--surface2);padding:3px 8px;border-radius:6px;font-size:12px;font-weight:600;color:var(--accent)}
+
+/* DESKTOP */
+@media(min-width:768px){
+  :root{--header-h:0px;--nav-h:0px}
+  #offline-banner{left:260px}
+  body{display:flex}
+  #sidebar{
+    width:260px;flex:0 0 260px;background:var(--surface);
+    border-right:1px solid var(--border);height:100vh;overflow-y:auto;
+    display:flex!important;flex-direction:column;padding:24px 16px;position:sticky;top:0;
+  }
+  header{display:none}
+  #bottom-nav{display:none}
+  #app{padding-top:0;flex:1;min-height:100vh}
+  #content{padding-bottom:0}
+  .screen{padding:24px}
+  .sidebar-logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--accent);margin-bottom:4px}
+  .sidebar-logo span{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-muted);font-weight:300;letter-spacing:0.15em;text-transform:uppercase}
+  .sidebar-lang{margin:16px 0;width:100%}
+  .sidebar-nav{display:flex;flex-direction:column;gap:4px;flex:1}
+  .sidebar-btn{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    border:none;background:none;color:var(--text-muted);font-size:14px;
+    font-family:'DM Sans',sans-serif;cursor:pointer;text-align:left;min-height:44px;
+    transition:all 0.15s;
+  }
+  .sidebar-btn .icon{font-size:18px}
+  .sidebar-btn.active{background:rgba(232,160,69,0.12);color:var(--accent)}
+  .sidebar-btn:active,.sidebar-btn:hover{background:var(--surface2)}
+  .sidebar-streak{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+}
+@media(max-width:767px){#sidebar{display:none}}
+
+/* SEPARATOR */
+.sep{height:1px;background:var(--border);margin:14px 0}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(74,222,128,0.15);color:var(--green)}
+.badge-amber{background:rgba(232,160,69,0.15);color:var(--accent)}
+.badge-purple{background:rgba(139,92,246,0.15);color:var(--accent2)}
+
+/* CALC */
+.calc-display{
+  background:var(--surface2);border-radius:10px;padding:12px 16px;
+  font-family:'Playfair Display',serif;font-size:28px;text-align:right;
+  margin-bottom:10px;min-height:60px;word-break:break-all;
+}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc-key{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:14px 0;font-size:16px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  min-height:44px;text-align:center;
+}
+.calc-key:active{background:var(--surface)}
+.calc-key.op{color:var(--accent);font-weight:600}
+.calc-key.eq{background:var(--accent);color:#0f0e17;font-weight:700}
+.calc-key.eq:active{background:#c8882e}
+</style>
+</head>
+<body>
+<div id="offline-banner">⚡ You're offline — cached content is available. Live features paused.</div>
+<div id="sidebar">
+  <div class="sidebar-logo">🌍 LinguaLocal<span>Live like a local</span></div>
+  <div class="sidebar-lang">
+    <select id="lang-select-sidebar" class="input" style="font-size:14px" onchange="setLanguage(this.value)"></select>
+  </div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+  <div class="sidebar-streak">
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">🔥 Streak</div>
+    <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--accent)" id="sidebar-streak-num">0</div>
+    <div style="font-size:12px;color:var(--text-muted)">days in a row</div>
+  </div>
+</div>
+<div id="app">
+  <header>
+    <div class="logo">🌍 LinguaLocal<span>Live like a local</span></div>
+    <select id="lang-select" class="input" style="font-size:13px" onchange="setLanguage(this.value)"></select>
+  </header>
+  <nav id="bottom-nav" aria-label="Main navigation"></nav>
+  <main id="content">
+    <div class="screen" id="screen-home"></div>
+    <div class="screen" id="screen-phrases"></div>
+    <div class="screen" id="screen-write"></div>
+    <div class="screen" id="screen-speak"></div>
+    <div class="screen" id="screen-translate"></div>
+    <div class="screen" id="screen-visual"></div>
+    <div class="screen" id="screen-currency"></div>
+    <div class="screen" id="screen-coach"></div>
+    <div class="screen" id="screen-progress"></div>
+  </main>
+</div>
+
+<!-- Emergency Overlay -->
+<div id="emergency-overlay" class="emergency-overlay">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h2 style="color:var(--red)">🆘 Emergency Phrases</h2>
+    <button class="btn btn-ghost btn-sm" onclick="closeEmergency()">✕ Close</button>
+  </div>
+  <div id="emergency-content"></div>
+</div>
+
+<button class="sos-btn" onclick="openEmergency()">SOS</button>
+
+<script>
+// ============================
+// SERVICE WORKER (Blob URL)
+// ============================
+const SW_CODE = `
+const CACHE = 'lingualocal-v1';
+const SHELL = ['https://fonts.googleapis.com','https://fonts.gstatic.com','https://cdnjs.cloudflare.com'];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.add('/'))
+      .catch(() => {})
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  const isAPI = url.includes('api.anthropic.com') || url.includes('openexchangerates.org');
+  if (isAPI) {
+    e.respondWith(
+      fetch(e.request).catch(() => new Response(JSON.stringify({offline:true}),{headers:{'Content-Type':'application/json'}}))
+    );
+    return;
+  }
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(resp => {
+        if (resp && resp.status === 200 && e.request.method === 'GET') {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => caches.match('/'));
+    })
+  );
+});
+`;
+if ('serviceWorker' in navigator) {
+  const blob = new Blob([SW_CODE], {type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+// ============================
+// OFFLINE DETECTION
+// ============================
+function updateOnlineStatus() {
+  const b = document.getElementById('offline-banner');
+  if (navigator.onLine) { b.classList.remove('visible'); }
+  else { b.classList.add('visible'); }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ============================
+// STATE
+// ============================
+let currentLanguage = localStorage.getItem('ll_language') || 'English';
+let currentTab = 'home';
+let streakData = JSON.parse(localStorage.getItem('ll_streak') || '{"count":7,"days":[1,1,1,1,1,0,0]}');
+let progressData = JSON.parse(localStorage.getItem('ll_progress') || '{"wordsLearned":47,"phrasesMastered":23,"speakingScore":71,"minutesToday":18}');
+let savedPhrases = JSON.parse(localStorage.getItem('ll_saved') || '[]');
+let coachHistory = [];
+let apiKey = localStorage.getItem('ll_apikey') || '';
+let progressChart = null;
+
+// ============================
+// LANGUAGE DATA
+// ============================
+const LANGUAGES = ['English','Spanish','French','Japanese','Italian','German','Portuguese','Mandarin','Arabic','Cantonese','Thai','Vietnamese'];
+
+const LANG_DATA = {
+  English: {
+    code:'en-US', flag:'🇺🇸',
+    greeting:'Good day!', greetingSub:'Your English journey continues',
+    challenge:{ phrase:'How much does this cost?', phonetic:'How much does this cost?', en:'How much does this cost?' },
+    coachName:'Alex', coachEmoji:'🧑‍🏫',
+    coachIntro:"Hello! I'm Alex, your English coach. Let's practice together!",
+    currency:'USD', country:'United States',
+    rent:'$1,800/mo', meal:'$15', transport:'$2.75',
+    writePrompt:'Translate to English: "The weather is beautiful today."',
+    speakPhrase:'The weather is beautiful today.',
+    speakPhonetic:'[thuh weh-ther iz byoo-tuh-ful tuh-day]',
+    speakEN:'The weather is beautiful today.',
+    chars:[],
+    categories:{
+      Housing:[ {n:"Where can I rent an apartment?",r:"Where can I rent an apartment?",e:"Where can I rent an apartment?"}, {n:"How much is the monthly rent?",r:"How much is the monthly rent?",e:"How much is the monthly rent?"}, {n:"Is water included?",r:"Is water included?",e:"Is water included?"}, {n:"I need a key.",r:"I need a key.",e:"I need a key."} ],
+      'Food & Dining':[ {n:"A table for two, please.",r:"A table for two, please.",e:"A table for two, please."}, {n:"What do you recommend?",r:"What do you recommend?",e:"What do you recommend?"}, {n:"The bill, please.",r:"The bill, please.",e:"The bill, please."}, {n:"I am allergic to nuts.",r:"I am allergic to nuts.",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"The electricity is out.",r:"The electricity is out.",e:"The electricity is out."}, {n:"I need internet access.",r:"I need internet access.",e:"I need internet access."}, {n:"How do I pay utilities?",r:"How do I pay utilities?",e:"How do I pay utilities?"} ],
+      'Fitting In':[ {n:"Nice to meet you.",r:"Nice to meet you.",e:"Nice to meet you."}, {n:"I am learning English.",r:"I am learning English.",e:"I am learning English."}, {n:"Please speak slowly.",r:"Please speak slowly.",e:"Please speak slowly."} ],
+      Transport:[ {n:"Where is the nearest station?",r:"Where is the nearest station?",e:"Where is the nearest station?"}, {n:"How do I get to downtown?",r:"How do I get to downtown?",e:"How do I get to downtown?"} ],
+      Emergency:[ {n:"Help!",r:"Help!",e:"Help!"}, {n:"Call the police!",r:"Call the police!",e:"Call the police!"}, {n:"I need a doctor.",r:"I need a doctor.",e:"I need a doctor."}, {n:"Call an ambulance!",r:"Call an ambulance!",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"How much is this?",r:"How much is this?",e:"How much is this?"}, {n:"Do you have a smaller size?",r:"Do you have a smaller size?",e:"Do you have a smaller size?"}, {n:"I would like to return this.",r:"I would like to return this.",e:"I would like to return this."} ],
+    },
+    emergency:[{n:"Help!",e:"Help!"},{n:"Call the police!",e:"Call the police!"},{n:"I need a doctor.",e:"I need a doctor."},{n:"I am lost.",e:"I am lost."},{n:"Call an ambulance!",e:"Call an ambulance!"},{n:"I need help!",e:"I need help!"}]
+  },
+  Spanish: {
+    code:'es-ES', flag:'🇪🇸',
+    greeting:'¡Buenos días!', greetingSub:'Tu camino en español continúa',
+    challenge:{ phrase:'¿Cuánto cuesta esto?', phonetic:'KWAN-toh KWES-tah ES-toh', en:'How much does this cost?' },
+    coachName:'Sofia', coachEmoji:'👩‍🏫',
+    coachIntro:"¡Hola! Soy Sofia, tu profesora de español. ¡Vamos a practicar juntos!",
+    currency:'EUR', country:'Spain / Latin America',
+    rent:'€900/mes', meal:'€12', transport:'€1.50',
+    writePrompt:'Translate to Spanish: "The weather is beautiful today."',
+    speakPhrase:'El tiempo está hermoso hoy.',
+    speakPhonetic:'[el TYEM-poh es-TAH er-MOH-soh oy]',
+    speakEN:'The weather is beautiful today.',
+    chars:['á','é','í','ó','ú','ü','ñ','¡','¿'],
+    categories:{
+      Housing:[ {n:"¿Dónde puedo alquilar un apartamento?",r:"DOHN-deh PWEH-doh al-kee-LAR",e:"Where can I rent an apartment?"}, {n:"¿Cuánto es el alquiler mensual?",r:"KWAN-toh es el al-kee-LER men-SWAL",e:"How much is the monthly rent?"}, {n:"¿Está incluida el agua?",r:"es-TAH in-KLOO-ee-dah el AH-gwah",e:"Is water included?"}, {n:"Necesito una llave.",r:"neh-seh-SEE-toh OO-nah YAH-veh",e:"I need a key."} ],
+      'Food & Dining':[ {n:"Una mesa para dos, por favor.",r:"OO-nah MEH-sah PAH-rah dos por fah-VOR",e:"A table for two, please."}, {n:"¿Qué recomienda?",r:"keh reh-koh-MYEN-dah",e:"What do you recommend?"}, {n:"La cuenta, por favor.",r:"lah KWEN-tah por fah-VOR",e:"The bill, please."}, {n:"Soy alérgico a los frutos secos.",r:"soy ah-LER-hee-koh ah los FROO-tos SEH-kos",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"Se fue la luz.",r:"seh fweh lah loos",e:"The electricity is out."}, {n:"Necesito internet.",r:"neh-seh-SEE-toh een-ter-NET",e:"I need internet access."}, {n:"¿Cómo pago los servicios?",r:"KOH-moh PAH-goh los ser-VEE-syos",e:"How do I pay utilities?"} ],
+      'Fitting In':[ {n:"Mucho gusto.",r:"MOO-choh GOOS-toh",e:"Nice to meet you."}, {n:"Estoy aprendiendo español.",r:"es-TOY ah-pren-DYEN-doh es-pah-NYOL",e:"I am learning Spanish."}, {n:"Por favor, hable despacio.",r:"por fah-VOR AH-bleh des-PAH-syoh",e:"Please speak slowly."} ],
+      Transport:[ {n:"¿Dónde está la estación más cercana?",r:"DOHN-deh es-TAH lah es-tah-SYON mas ser-KAH-nah",e:"Where is the nearest station?"}, {n:"¿Cómo llego al centro?",r:"KOH-moh YEH-goh al SEN-troh",e:"How do I get to downtown?"} ],
+      Emergency:[ {n:"¡Ayuda!",r:"ah-YOO-dah",e:"Help!"}, {n:"¡Llame a la policía!",r:"YAH-meh ah lah po-lee-SEE-ah",e:"Call the police!"}, {n:"Necesito un médico.",r:"neh-seh-SEE-toh oon MEH-dee-koh",e:"I need a doctor."}, {n:"¡Llame a una ambulancia!",r:"YAH-meh ah oo-nah am-boo-LAN-syah",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"¿Cuánto cuesta esto?",r:"KWAN-toh KWES-tah ES-toh",e:"How much is this?"}, {n:"¿Tiene una talla más pequeña?",r:"TYEH-neh OO-nah TAH-yah mas peh-KEN-yah",e:"Do you have a smaller size?"}, {n:"Quisiera devolver esto.",r:"kee-SYEH-rah deh-vol-VER ES-toh",e:"I would like to return this."} ],
+    },
+    emergency:[ {n:"¡Ayuda!",e:"Help!"},{n:"¡Llame a la policía!",e:"Call the police!"},{n:"Necesito un médico.",e:"I need a doctor."},{n:"Estoy perdido.",e:"I am lost."},{n:"¡Llame a una ambulancia!",e:"Call an ambulance!"},{n:"¡Hay un incendio!",e:"There is a fire!"} ]
+  },
+  French: {
+    code:'fr-FR', flag:'🇫🇷',
+    greeting:'Bonjour !', greetingSub:'Votre aventure en français continue',
+    challenge:{ phrase:'Combien ça coûte ?', phonetic:'kom-BYAN sah KOOT', en:'How much does this cost?' },
+    coachName:'Claire', coachEmoji:'👩‍🎓',
+    coachIntro:"Bonjour ! Je suis Claire, votre coach en français. Pratiquons ensemble !",
+    currency:'EUR', country:'France',
+    rent:'€1,100/mois', meal:'€15', transport:'€1.90',
+    writePrompt:'Translate to French: "The weather is beautiful today."',
+    speakPhrase:'Il fait beau aujourd\'hui.',
+    speakPhonetic:'[eel feh boh oh-zhoor-DWEE]',
+    speakEN:'The weather is beautiful today.',
+    chars:['à','â','ä','é','è','ê','ë','î','ï','ô','ù','û','ü','ÿ','ç','æ','œ'],
+    categories:{
+      Housing:[ {n:"Où puis-je louer un appartement ?",r:"oo pwee-zhuh lweh uhn ah-par-tuh-MAHN",e:"Where can I rent an apartment?"}, {n:"Quel est le loyer mensuel ?",r:"kel eh luh lwah-YEH mahn-SWEL",e:"How much is the monthly rent?"}, {n:"L'eau est-elle incluse ?",r:"loh eh-tel an-KLEEZ",e:"Is water included?"}, {n:"J'ai besoin d'une clé.",r:"zheh buh-ZWAN doon kleh",e:"I need a key."} ],
+      'Food & Dining':[ {n:"Une table pour deux, s'il vous plaît.",r:"oon TAH-bluh poor duh seel voo pleh",e:"A table for two, please."}, {n:"Qu'est-ce que vous recommandez ?",r:"kes-kuh voo ruh-kuh-mahn-DEH",e:"What do you recommend?"}, {n:"L'addition, s'il vous plaît.",r:"lah-dee-SYON seel voo pleh",e:"The bill, please."}, {n:"Je suis allergique aux noix.",r:"zhuh swee ah-lair-ZHEEK oh nwah",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"Il n'y a plus d'électricité.",r:"eel nyah ploo deh-lek-tree-see-TEH",e:"The electricity is out."}, {n:"J'ai besoin d'internet.",r:"zheh buh-ZWAN dan-tair-NET",e:"I need internet access."}, {n:"Comment payer les charges ?",r:"koh-MAHN peh-YEH leh SHARZH",e:"How do I pay utilities?"} ],
+      'Fitting In':[ {n:"Enchanté(e).",r:"ahn-shahn-TEH",e:"Nice to meet you."}, {n:"J'apprends le français.",r:"zhah-PRAHN luh frahn-SEH",e:"I am learning French."}, {n:"Parlez lentement, s'il vous plaît.",r:"par-LEH lahn-tuh-MAHN seel voo pleh",e:"Please speak slowly."} ],
+      Transport:[ {n:"Où est la station la plus proche ?",r:"oo eh lah stah-SYON lah ploo prosh",e:"Where is the nearest station?"}, {n:"Comment aller au centre-ville ?",r:"koh-MAHN ah-LEH oh SAHN-truh veel",e:"How do I get to downtown?"} ],
+      Emergency:[ {n:"Au secours !",r:"oh suh-KOOR",e:"Help!"}, {n:"Appelez la police !",r:"ah-pleh-LEH lah po-LEES",e:"Call the police!"}, {n:"J'ai besoin d'un médecin.",r:"zheh buh-ZWAN dun med-SAN",e:"I need a doctor."}, {n:"Appelez une ambulance !",r:"ah-pleh-LEH oon ahm-boo-LAHNS",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"Combien ça coûte ?",r:"kom-BYAN sah KOOT",e:"How much is this?"}, {n:"Avez-vous une taille plus petite ?",r:"ah-veh-voo oon TAH-yuh ploo puh-TEET",e:"Do you have a smaller size?"}, {n:"Je voudrais retourner ceci.",r:"zhuh voo-DREH ruh-toor-NEH suh-SEE",e:"I would like to return this."} ],
+    },
+    emergency:[ {n:"Au secours !",e:"Help!"},{n:"Appelez la police !",e:"Call the police!"},{n:"J'ai besoin d'un médecin.",e:"I need a doctor."},{n:"Je suis perdu(e).",e:"I am lost."},{n:"Appelez une ambulance !",e:"Call an ambulance!"},{n:"Il y a un incendie !",e:"There is a fire!"} ]
+  },
+  Japanese: {
+    code:'ja-JP', flag:'🇯🇵',
+    greeting:'おはようございます！', greetingSub:'日本語の旅を続けましょう',
+    challenge:{ phrase:'これはいくらですか？', phonetic:'Kore wa ikura desu ka?', en:'How much does this cost?' },
+    coachName:'Hana', coachEmoji:'👩‍🏫',
+    coachIntro:"こんにちは！私はHanaです。一緒に日本語を練習しましょう！",
+    currency:'JPY', country:'Japan',
+    rent:'¥80,000/月', meal:'¥900', transport:'¥200',
+    writePrompt:'Translate to Japanese: "The weather is beautiful today."',
+    speakPhrase:'今日はお天気がいいですね。',
+    speakPhonetic:'[Kyō wa otenki ga ii desu ne]',
+    speakEN:'The weather is beautiful today.',
+    chars:['あ','い','う','え','お','か','き','く','け','こ','は','ひ','ふ','へ','ほ','ま','み','む','め','も','た','ち','つ','て','と'],
+    categories:{
+      Housing:[ {n:"アパートを借りたいのですが。",r:"Apāto wo karitai no desu ga",e:"I want to rent an apartment."}, {n:"家賃はいくらですか？",r:"Yachin wa ikura desu ka",e:"How much is the rent?"}, {n:"水道代は含まれていますか？",r:"Suidōdai wa fukumarete imasu ka",e:"Is water included?"}, {n:"鍵が必要です。",r:"Kagi ga hitsuyō desu",e:"I need a key."} ],
+      'Food & Dining':[ {n:"2名のテーブルをお願いします。",r:"Nimei no tēburu wo onegaishimasu",e:"A table for two, please."}, {n:"おすすめは何ですか？",r:"Osusume wa nan desu ka",e:"What do you recommend?"}, {n:"お会計をお願いします。",r:"Okaikei wo onegaishimasu",e:"The bill, please."}, {n:"ナッツアレルギーがあります。",r:"Nattsu arerugī ga arimasu",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"停電しています。",r:"Teiden shite imasu",e:"The electricity is out."}, {n:"インターネットが必要です。",r:"Intānetto ga hitsuyō desu",e:"I need internet access."} ],
+      'Fitting In':[ {n:"はじめまして。",r:"Hajimemashite",e:"Nice to meet you."}, {n:"日本語を勉強しています。",r:"Nihongo wo benkyō shite imasu",e:"I am learning Japanese."}, {n:"ゆっくり話してください。",r:"Yukkuri hanashite kudasai",e:"Please speak slowly."} ],
+      Transport:[ {n:"一番近い駅はどこですか？",r:"Ichiban chikai eki wa doko desu ka",e:"Where is the nearest station?"}, {n:"市内中心部への行き方は？",r:"Shinai chūshinbu e no ikikata wa",e:"How do I get to downtown?"} ],
+      Emergency:[ {n:"助けてください！",r:"Tasukete kudasai",e:"Help!"}, {n:"警察を呼んでください！",r:"Keisatsu wo yonde kudasai",e:"Call the police!"}, {n:"医者が必要です。",r:"Isha ga hitsuyō desu",e:"I need a doctor."}, {n:"救急車を呼んでください！",r:"Kyūkyūsha wo yonde kudasai",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"これはいくらですか？",r:"Kore wa ikura desu ka",e:"How much is this?"}, {n:"もっと小さいサイズはありますか？",r:"Motto chiisai saizu wa arimasu ka",e:"Do you have a smaller size?"}, {n:"返品したいのですが。",r:"Henpin shitai no desu ga",e:"I would like to return this."} ],
+    },
+    emergency:[ {n:"助けてください！",e:"Help!"},{n:"警察を呼んでください！",e:"Call the police!"},{n:"医者が必要です。",e:"I need a doctor."},{n:"迷子になりました。",e:"I am lost."},{n:"救急車を呼んでください！",e:"Call an ambulance!"},{n:"火事です！",e:"Fire!"} ]
+  },
+  Italian: {
+    code:'it-IT', flag:'🇮🇹',
+    greeting:'Buongiorno!', greetingSub:'Il tuo viaggio in italiano continua',
+    challenge:{ phrase:'Quanto costa questo?', phonetic:'KWAN-toh KOS-tah KWES-toh', en:'How much does this cost?' },
+    coachName:'Marco', coachEmoji:'👨‍🏫',
+    coachIntro:"Ciao! Sono Marco, il tuo coach di italiano. Pratichiamo insieme!",
+    currency:'EUR', country:'Italy',
+    rent:'€900/mese', meal:'€12', transport:'€1.50',
+    writePrompt:'Translate to Italian: "The weather is beautiful today."',
+    speakPhrase:'Il tempo è bellissimo oggi.',
+    speakPhonetic:'[eel TEM-poh eh bel-LEES-see-moh OD-jee]',
+    speakEN:'The weather is beautiful today.',
+    chars:['à','è','é','ì','î','ò','ó','ù'],
+    categories:{
+      Housing:[ {n:"Dove posso affittare un appartamento?",r:"DOH-veh POS-soh af-fit-TAH-reh",e:"Where can I rent an apartment?"}, {n:"Quanto è l'affitto mensile?",r:"KWAN-toh eh laf-FIT-toh men-SEE-leh",e:"How much is the monthly rent?"}, {n:"L'acqua è inclusa?",r:"LAK-kwah eh in-KLOO-zah",e:"Is water included?"}, {n:"Ho bisogno di una chiave.",r:"oh bee-ZON-yoh dee oo-nah KYAH-veh",e:"I need a key."} ],
+      'Food & Dining':[ {n:"Un tavolo per due, per favore.",r:"oon TAH-vo-loh per DOO-eh per fah-VOH-reh",e:"A table for two, please."}, {n:"Cosa consiglia?",r:"KOH-zah kon-SEE-lyah",e:"What do you recommend?"}, {n:"Il conto, per favore.",r:"eel KON-toh per fah-VOH-reh",e:"The bill, please."}, {n:"Sono allergico alle noci.",r:"SOH-noh al-LER-jee-koh AL-leh NOH-chee",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"Non c'è corrente.",r:"non cheh kor-REN-teh",e:"The electricity is out."}, {n:"Ho bisogno di internet.",r:"oh bee-ZON-yoh dee in-ter-NET",e:"I need internet access."} ],
+      'Fitting In':[ {n:"Piacere di conoscerti.",r:"pyah-CHEH-reh dee ko-NOH-shehr-tee",e:"Nice to meet you."}, {n:"Sto imparando l'italiano.",r:"stoh im-pah-RAN-doh lee-tah-LYA-noh",e:"I am learning Italian."}, {n:"Parli lentamente, per favore.",r:"PAR-lee len-tah-MEN-teh",e:"Please speak slowly."} ],
+      Transport:[ {n:"Dov'è la stazione più vicina?",r:"doh-VEH lah stah-TSYOH-neh pyoo vee-CHEE-nah",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"Aiuto!",r:"ah-YOO-toh",e:"Help!"}, {n:"Chiami la polizia!",r:"KYAH-mee lah po-lee-TSEE-ah",e:"Call the police!"}, {n:"Ho bisogno di un medico.",r:"oh bee-ZON-yoh dee oon MEH-dee-koh",e:"I need a doctor."}, {n:"Chiami un'ambulanza!",r:"KYAH-mee oon am-boo-LAN-tsah",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"Quanto costa questo?",r:"KWAN-toh KOS-tah KWES-toh",e:"How much is this?"}, {n:"Ha una taglia più piccola?",r:"ah oo-nah TAH-lyah pyoo PEEK-koh-lah",e:"Do you have a smaller size?"} ],
+    },
+    emergency:[ {n:"Aiuto!",e:"Help!"},{n:"Chiami la polizia!",e:"Call the police!"},{n:"Ho bisogno di un medico.",e:"I need a doctor."},{n:"Mi sono perso.",e:"I am lost."},{n:"Chiami un'ambulanza!",e:"Call an ambulance!"},{n:"C'è un incendio!",e:"There is a fire!"} ]
+  },
+  German: {
+    code:'de-DE', flag:'🇩🇪',
+    greeting:'Guten Tag!', greetingSub:'Deine Deutschreise geht weiter',
+    challenge:{ phrase:'Wie viel kostet das?', phonetic:'vee FEEL KOS-tet das', en:'How much does this cost?' },
+    coachName:'Max', coachEmoji:'👨‍🎓',
+    coachIntro:"Hallo! Ich bin Max, dein Deutschcoach. Lass uns zusammen üben!",
+    currency:'EUR', country:'Germany',
+    rent:'€900/Monat', meal:'€10', transport:'€2.90',
+    writePrompt:'Translate to German: "The weather is beautiful today."',
+    speakPhrase:'Das Wetter ist heute schön.',
+    speakPhonetic:'[das VET-ter ist HOY-teh shern]',
+    speakEN:'The weather is beautiful today.',
+    chars:['ä','ö','ü','Ä','Ö','Ü','ß'],
+    categories:{
+      Housing:[ {n:"Wo kann ich eine Wohnung mieten?",r:"voh kan ikh EYE-neh VOH-nung MEE-ten",e:"Where can I rent an apartment?"}, {n:"Wie viel ist die monatliche Miete?",r:"vee FEEL ist dee MOH-nat-lee-kheh MEE-teh",e:"How much is the monthly rent?"}, {n:"Ist Wasser inbegriffen?",r:"ist VAS-ser in-beh-GRIF-fen",e:"Is water included?"}, {n:"Ich brauche einen Schlüssel.",r:"ikh BROW-kheh EYE-nen SHLUS-sel",e:"I need a key."} ],
+      'Food & Dining':[ {n:"Einen Tisch für zwei, bitte.",r:"EYE-nen tish fur tsvai BIT-teh",e:"A table for two, please."}, {n:"Was empfehlen Sie?",r:"vas em-PFEH-len zee",e:"What do you recommend?"}, {n:"Die Rechnung, bitte.",r:"dee REKH-nung BIT-teh",e:"The bill, please."}, {n:"Ich bin allergisch gegen Nüsse.",r:"ikh bin ah-LER-gish GEH-gen NUS-seh",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"Der Strom ist ausgefallen.",r:"der shtrom ist OWS-geh-fah-len",e:"The electricity is out."}, {n:"Ich brauche Internet.",r:"ikh BROW-kheh in-ter-NET",e:"I need internet access."} ],
+      'Fitting In':[ {n:"Freut mich, Sie kennenzulernen.",r:"froyt mikh zee KEN-nen-tsoo-ler-nen",e:"Nice to meet you."}, {n:"Ich lerne Deutsch.",r:"ikh LER-neh doych",e:"I am learning German."}, {n:"Bitte sprechen Sie langsam.",r:"BIT-teh SHPREH-khen zee LANG-zam",e:"Please speak slowly."} ],
+      Transport:[ {n:"Wo ist der nächste Bahnhof?",r:"voh ist der NEKH-steh BAHN-hohf",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"Hilfe!",r:"HIL-feh",e:"Help!"}, {n:"Rufen Sie die Polizei!",r:"ROO-fen zee dee po-lee-TSAY",e:"Call the police!"}, {n:"Ich brauche einen Arzt.",r:"ikh BROW-kheh EYE-nen artst",e:"I need a doctor."}, {n:"Rufen Sie einen Krankenwagen!",r:"ROO-fen zee EYE-nen KRAN-ken-vah-gen",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"Wie viel kostet das?",r:"vee FEEL KOS-tet das",e:"How much is this?"}, {n:"Haben Sie eine kleinere Größe?",r:"HAH-ben zee EYE-neh KLY-neh-reh GRERS-seh",e:"Do you have a smaller size?"} ],
+    },
+    emergency:[ {n:"Hilfe!",e:"Help!"},{n:"Rufen Sie die Polizei!",e:"Call the police!"},{n:"Ich brauche einen Arzt.",e:"I need a doctor."},{n:"Ich habe mich verlaufen.",e:"I am lost."},{n:"Rufen Sie einen Krankenwagen!",e:"Call an ambulance!"},{n:"Es brennt!",e:"There is a fire!"} ]
+  },
+  Portuguese: {
+    code:'pt-BR', flag:'🇧🇷',
+    greeting:'Bom dia!', greetingSub:'Sua jornada em português continua',
+    challenge:{ phrase:'Quanto custa isso?', phonetic:'KWAN-toh KUS-tah EE-soh', en:'How much does this cost?' },
+    coachName:'Bia', coachEmoji:'👩‍🏫',
+    coachIntro:"Olá! Sou Bia, sua professora de português. Vamos praticar juntos!",
+    currency:'BRL', country:'Brazil',
+    rent:'R$1,800/mês', meal:'R$25', transport:'R$4.40',
+    writePrompt:'Translate to Portuguese: "The weather is beautiful today."',
+    speakPhrase:'O tempo está lindo hoje.',
+    speakPhonetic:'[oh TEM-poh es-TAH LEEN-doh OH-zheh]',
+    speakEN:'The weather is beautiful today.',
+    chars:['ã','â','á','à','ä','ê','é','è','î','í','ô','ó','ò','û','ú','ù','ç','õ'],
+    categories:{
+      Housing:[ {n:"Onde posso alugar um apartamento?",r:"ON-deh POS-soh ah-loo-GAR oom ah-par-tah-MEN-toh",e:"Where can I rent an apartment?"}, {n:"Quanto é o aluguel mensal?",r:"KWAN-toh eh oh ah-loo-GEL men-SAL",e:"How much is the monthly rent?"}, {n:"A água está incluída?",r:"ah AH-gwah es-TAH een-kloo-EE-dah",e:"Is water included?"}, {n:"Preciso de uma chave.",r:"preh-SEE-zoh deh OO-mah SHAH-veh",e:"I need a key."} ],
+      'Food & Dining':[ {n:"Uma mesa para dois, por favor.",r:"OO-mah MEH-zah PAH-rah doyz por fah-VOR",e:"A table for two, please."}, {n:"O que você recomenda?",r:"oh keh voh-SEH heh-koh-MEN-dah",e:"What do you recommend?"}, {n:"A conta, por favor.",r:"ah KON-tah por fah-VOR",e:"The bill, please."} ],
+      Utilities:[ {n:"A energia elétrica caiu.",r:"ah eh-NER-zhyah eh-LET-ree-kah kah-YOO",e:"The electricity is out."}, {n:"Preciso de internet.",r:"preh-SEE-zoh deh een-ter-NET",e:"I need internet access."} ],
+      'Fitting In':[ {n:"Prazer em conhecê-lo.",r:"prah-ZER em koh-nyeh-SEH-loh",e:"Nice to meet you."}, {n:"Estou aprendendo português.",r:"es-TOH ah-pren-DEN-doh por-too-GESH",e:"I am learning Portuguese."}, {n:"Por favor, fale devagar.",r:"por fah-VOR FAH-leh deh-vah-GAR",e:"Please speak slowly."} ],
+      Transport:[ {n:"Onde fica a estação mais próxima?",r:"ON-deh FEE-kah ah es-tah-SOWN mayz PROH-see-mah",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"Socorro!",r:"soh-KOR-roh",e:"Help!"}, {n:"Chame a polícia!",r:"SHAH-meh ah poh-LEE-syah",e:"Call the police!"}, {n:"Preciso de um médico.",r:"preh-SEE-zoh deh oom MEH-djee-koh",e:"I need a doctor."}, {n:"Chame uma ambulância!",r:"SHAH-meh OO-mah am-boo-LAN-syah",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"Quanto custa isso?",r:"KWAN-toh KUS-tah EE-soh",e:"How much is this?"}, {n:"Tem um tamanho menor?",r:"teng oom tah-MAH-nyoh meh-NOR",e:"Do you have a smaller size?"} ],
+    },
+    emergency:[ {n:"Socorro!",e:"Help!"},{n:"Chame a polícia!",e:"Call the police!"},{n:"Preciso de um médico.",e:"I need a doctor."},{n:"Estou perdido.",e:"I am lost."},{n:"Chame uma ambulância!",e:"Call an ambulance!"},{n:"Há um incêndio!",e:"There is a fire!"} ]
+  },
+  Mandarin: {
+    code:'zh-CN', flag:'🇨🇳',
+    greeting:'你好！', greetingSub:'继续你的普通话之旅',
+    challenge:{ phrase:'这个多少钱？', phonetic:'Zhège duōshao qián?', en:'How much does this cost?' },
+    coachName:'Mei', coachEmoji:'👩‍🏫',
+    coachIntro:"你好！我是Mei，你的普通话老师。我们一起练习吧！",
+    currency:'CNY', country:'China',
+    rent:'¥4,500/月', meal:'¥25', transport:'¥2',
+    writePrompt:'Translate to Mandarin: "The weather is beautiful today."',
+    speakPhrase:'今天天气很好。',
+    speakPhonetic:'[Jīntiān tiānqì hěn hǎo]',
+    speakEN:'The weather is beautiful today.',
+    chars:['的','是','在','人','有','我','他','这','中','大','来','上','国','为','以'],
+    categories:{
+      Housing:[ {n:"我在哪里可以租公寓？",r:"Wǒ zài nǎlǐ kěyǐ zū gōngyù?",e:"Where can I rent an apartment?"}, {n:"月租是多少？",r:"Yuèzū shì duōshao?",e:"How much is the monthly rent?"}, {n:"包括水费吗？",r:"Bāokuò shuǐfèi ma?",e:"Is water included?"}, {n:"我需要一把钥匙。",r:"Wǒ xūyào yī bǎ yàoshi",e:"I need a key."} ],
+      'Food & Dining':[ {n:"两位，请给我一张桌子。",r:"Liǎng wèi, qǐng gěi wǒ yī zhāng zhuōzi",e:"A table for two, please."}, {n:"您有什么推荐？",r:"Nín yǒu shénme tuījiàn?",e:"What do you recommend?"}, {n:"请结账。",r:"Qǐng jiézhàng",e:"The bill, please."}, {n:"我对坚果过敏。",r:"Wǒ duì jiānguǒ guòmǐn",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"停电了。",r:"Tíngdiàn le",e:"The electricity is out."}, {n:"我需要网络。",r:"Wǒ xūyào wǎngluò",e:"I need internet access."} ],
+      'Fitting In':[ {n:"很高兴认识你。",r:"Hěn gāoxìng rènshi nǐ",e:"Nice to meet you."}, {n:"我在学普通话。",r:"Wǒ zài xué pǔtōnghuà",e:"I am learning Mandarin."}, {n:"请说慢一点。",r:"Qǐng shuō màn yīdiǎn",e:"Please speak slowly."} ],
+      Transport:[ {n:"最近的地铁站在哪里？",r:"Zuìjìn de dìtiě zhàn zài nǎlǐ?",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"救命！",r:"Jiùmìng!",e:"Help!"}, {n:"请叫警察！",r:"Qǐng jiào jǐngchá!",e:"Call the police!"}, {n:"我需要医生。",r:"Wǒ xūyào yīshēng",e:"I need a doctor."}, {n:"请叫救护车！",r:"Qǐng jiào jiùhùchē!",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"这个多少钱？",r:"Zhège duōshao qián?",e:"How much is this?"}, {n:"有更小的尺码吗？",r:"Yǒu gèng xiǎo de chǐmǎ ma?",e:"Do you have a smaller size?"} ],
+    },
+    emergency:[ {n:"救命！",e:"Help!"},{n:"请叫警察！",e:"Call the police!"},{n:"我需要医生。",e:"I need a doctor."},{n:"我迷路了。",e:"I am lost."},{n:"请叫救护车！",e:"Call an ambulance!"},{n:"着火了！",e:"Fire!"} ]
+  },
+  Arabic: {
+    code:'ar-SA', flag:'🇸🇦',
+    greeting:'مرحباً!', greetingSub:'رحلتك في اللغة العربية مستمرة',
+    challenge:{ phrase:'كم يكلف هذا؟', phonetic:'Kam yukallif hatha?', en:'How much does this cost?' },
+    coachName:'Leila', coachEmoji:'👩‍🏫',
+    coachIntro:"مرحباً! أنا ليلى، مدرّستك في اللغة العربية. لنتدرّب معاً!",
+    currency:'AED', country:'Arab World',
+    rent:'AED 4,000/شهر', meal:'AED 35', transport:'AED 5',
+    writePrompt:'Translate to Arabic: "The weather is beautiful today."',
+    speakPhrase:'الطقس جميل اليوم.',
+    speakPhonetic:'[at-TAQ-su ja-MEEL al-YAWM]',
+    speakEN:'The weather is beautiful today.',
+    chars:['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'],
+    categories:{
+      Housing:[ {n:"أين يمكنني استئجار شقة؟",r:"Ayna yumkinunī isti'jār shaqqa?",e:"Where can I rent an apartment?"}, {n:"كم الإيجار الشهري؟",r:"Kam al-ījār ash-shahrī?",e:"How much is the monthly rent?"}, {n:"هل يشمل الماء؟",r:"Hal yashmal al-mā'?",e:"Is water included?"}, {n:"أحتاج إلى مفتاح.",r:"Aḥtāju ilā miftāḥ",e:"I need a key."} ],
+      'Food & Dining':[ {n:"طاولة لشخصين من فضلك.",r:"Ṭāwila li-shakhṣayn min faḍlik",e:"A table for two, please."}, {n:"ماذا تنصح؟",r:"Mādhā tanṣaḥ?",e:"What do you recommend?"}, {n:"الحساب من فضلك.",r:"Al-ḥisāb min faḍlik",e:"The bill, please."} ],
+      Utilities:[ {n:"الكهرباء منقطعة.",r:"Al-kahrubā' munqaṭiʿa",e:"The electricity is out."} ],
+      'Fitting In':[ {n:"سعيد بلقائك.",r:"Saʿīd bi-liqāʾik",e:"Nice to meet you."}, {n:"أنا أتعلم العربية.",r:"Anā ataʿallam al-ʿarabiyya",e:"I am learning Arabic."}, {n:"من فضلك تكلم ببطء.",r:"Min faḍlik takallam bi-buṭʾ",e:"Please speak slowly."} ],
+      Transport:[ {n:"أين أقرب محطة؟",r:"Ayna aqrab maḥaṭṭa?",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"النجدة!",r:"An-najda!",e:"Help!"}, {n:"اتصل بالشرطة!",r:"Ittaṣil bishshurṭa!",e:"Call the police!"}, {n:"أحتاج إلى طبيب.",r:"Aḥtāju ilā ṭabīb",e:"I need a doctor."}, {n:"اتصل بالإسعاف!",r:"Ittaṣil bil-isʿāf!",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"كم يكلف هذا؟",r:"Kam yukallif hādhā?",e:"How much is this?"} ],
+    },
+    emergency:[ {n:"النجدة!",e:"Help!"},{n:"اتصل بالشرطة!",e:"Call the police!"},{n:"أحتاج إلى طبيب.",e:"I need a doctor."},{n:"أنا ضائع.",e:"I am lost."},{n:"اتصل بالإسعاف!",e:"Call an ambulance!"},{n:"هناك حريق!",e:"There is a fire!"} ]
+  },
+  Cantonese: {
+    code:'zh-HK', flag:'🇭🇰',
+    greeting:'早晨！', greetingSub:'繼續你嘅廣東話之旅',
+    challenge:{ phrase:'呢個幾錢？', phonetic:'Ni-go gei-chin?', en:'How much does this cost?' },
+    coachName:'Jade', coachEmoji:'👩‍🏫',
+    coachIntro:"你好！我係Jade，你嘅廣東話老師。我哋一齊練習啦！",
+    currency:'HKD', country:'Hong Kong',
+    rent:'HK$12,000/月', meal:'HK$60', transport:'HK$10',
+    writePrompt:'Translate to Cantonese: "The weather is beautiful today."',
+    speakPhrase:'今日天氣好靚。',
+    speakPhonetic:'[Gam-yat tin-hei hou leng]',
+    speakEN:'The weather is beautiful today.',
+    chars:['係','唔','我','你','佢','哋','嘅','喺','咁','囉','喇','咋','囉','㗎','啩'],
+    categories:{
+      Housing:[ {n:"我喺邊度可以租公寓？",r:"Ngo hai bin-do ho-yi jo gung-yue?",e:"Where can I rent an apartment?"}, {n:"月租係幾多？",r:"Yuet-jo hai gei-do?",e:"How much is the monthly rent?"}, {n:"包唔包水費？",r:"Baau m baau seui-fai?",e:"Is water included?"} ],
+      'Food & Dining':[ {n:"兩位，唔該。",r:"Leung wai, m-goi",e:"A table for two, please."}, {n:"你有咩推薦？",r:"Lei yau me teui-zin?",e:"What do you recommend?"}, {n:"埋單，唔該。",r:"Maai-daan, m-goi",e:"The bill, please."} ],
+      Utilities:[ {n:"停電咗。",r:"Ting-din zo",e:"The electricity is out."} ],
+      'Fitting In':[ {n:"好高興識你。",r:"Hou gou-hing sik lei",e:"Nice to meet you."}, {n:"我係學緊廣東話。",r:"Ngo hai hok-gan Gwong-dung-waa",e:"I am learning Cantonese."}, {n:"請你慢慢講。",r:"Cheng lei maan-maan gong",e:"Please speak slowly."} ],
+      Transport:[ {n:"最近嘅地鐵站喺邊？",r:"Zeoi-gan ge dei-tit-zaam hai bin?",e:"Where is the nearest MTR station?"} ],
+      Emergency:[ {n:"救命！",r:"Gau-meng!",e:"Help!"}, {n:"打999！",r:"Da gau-gau-gau!",e:"Call the police!"}, {n:"我需要睇醫生。",r:"Ngo seui-yiu tai yi-sang",e:"I need a doctor."}, {n:"叫救護車！",r:"Giu gau-wu-che!",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"呢個幾錢？",r:"Ni-go gei-chin?",e:"How much is this?"} ],
+    },
+    emergency:[ {n:"救命！",e:"Help!"},{n:"打999！",e:"Call the police!"},{n:"我需要睇醫生。",e:"I need a doctor."},{n:"我唔見咗路。",e:"I am lost."},{n:"叫救護車！",e:"Call an ambulance!"},{n:"着火喇！",e:"Fire!"} ]
+  },
+  Thai: {
+    code:'th-TH', flag:'🇹🇭',
+    greeting:'สวัสดี!', greetingSub:'การเดินทางภาษาไทยของคุณดำเนินต่อ',
+    challenge:{ phrase:'ราคาเท่าไหร่?', phonetic:'Ra-kha thao-rai?', en:'How much does this cost?' },
+    coachName:'Nong', coachEmoji:'👩‍🏫',
+    coachIntro:"สวัสดี! ฉันชื่อน้อง ครูภาษาไทยของคุณ มาฝึกด้วยกันเลย!",
+    currency:'THB', country:'Thailand',
+    rent:'฿12,000/เดือน', meal:'฿80', transport:'฿20',
+    writePrompt:'Translate to Thai: "The weather is beautiful today."',
+    speakPhrase:'วันนี้อากาศดีมาก',
+    speakPhonetic:'[Wan-née aa-gàat dee mâak]',
+    speakEN:'The weather is beautiful today.',
+    chars:['ก','ข','ค','ง','จ','ช','ซ','ญ','ด','ต','ถ','ท','น','บ','ป','ผ','พ','ฟ','ม','ย','ร','ล','ว','ส','ห','อ','ฮ'],
+    categories:{
+      Housing:[ {n:"ฉันเช่าอพาร์ตเมนต์ได้ที่ไหน?",r:"Chán châo a-pâat-men dâi thîi nǎi?",e:"Where can I rent an apartment?"}, {n:"ค่าเช่ารายเดือนเท่าไหร่?",r:"Khâa châo raai dʉan thâo-rài?",e:"How much is the monthly rent?"} ],
+      'Food & Dining':[ {n:"โต๊ะสำหรับสองคน ครับ/ค่ะ",r:"Tó sǎm-ràp sǒng khon, khráp/khâ",e:"A table for two, please."}, {n:"แนะนำอะไรดีครับ?",r:"Náe-nam à-rai dii khráp?",e:"What do you recommend?"}, {n:"เก็บตังค์ด้วย",r:"Kèp tang dûay",e:"The bill, please."} ],
+      Utilities:[ {n:"ไฟดับ",r:"Fai dàp",e:"The electricity is out."} ],
+      'Fitting In':[ {n:"ยินดีที่ได้รู้จัก",r:"Yin-dii thîi dâi rúu-jàk",e:"Nice to meet you."}, {n:"ฉันกำลังเรียนภาษาไทย",r:"Chán gam-lang rian phaa-sǎa Thai",e:"I am learning Thai."}, {n:"กรุณาพูดช้าๆ",r:"Ka-rú-naa phûut châa-châa",e:"Please speak slowly."} ],
+      Transport:[ {n:"สถานีที่ใกล้ที่สุดอยู่ที่ไหน?",r:"Sa-thǎa-nii thîi glâi thîi-sùt yùu thîi nǎi?",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"ช่วยด้วย!",r:"Chûay dûay!",e:"Help!"}, {n:"โทรตำรวจ!",r:"Thoo tam-rùat!",e:"Call the police!"}, {n:"ฉันต้องการหมอ",r:"Chán dtông-gaan mǒo",e:"I need a doctor."}, {n:"โทรรถพยาบาล!",r:"Thoo rót pha-yaa-baan!",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"ราคาเท่าไหร่?",r:"Ra-kha thâo-rài?",e:"How much is this?"} ],
+    },
+    emergency:[ {n:"ช่วยด้วย!",e:"Help!"},{n:"โทรตำรวจ!",e:"Call the police!"},{n:"ฉันต้องการหมอ",e:"I need a doctor."},{n:"ฉันหลงทาง",e:"I am lost."},{n:"โทรรถพยาบาล!",e:"Call an ambulance!"},{n:"ไฟไหม้!",e:"Fire!"} ]
+  },
+  Vietnamese: {
+    code:'vi-VN', flag:'🇻🇳',
+    greeting:'Xin chào!', greetingSub:'Hành trình tiếng Việt của bạn tiếp tục',
+    challenge:{ phrase:'Cái này bao nhiêu tiền?', phonetic:'Kai nay bao nyew tyen?', en:'How much does this cost?' },
+    coachName:'Linh', coachEmoji:'👩‍🏫',
+    coachIntro:"Xin chào! Tôi là Linh, giáo viên tiếng Việt của bạn. Hãy cùng luyện tập nhé!",
+    currency:'VND', country:'Vietnam',
+    rent:'₫8,000,000/tháng', meal:'₫45,000', transport:'₫7,000',
+    writePrompt:'Translate to Vietnamese: "The weather is beautiful today."',
+    speakPhrase:'Hôm nay thời tiết đẹp quá.',
+    speakPhonetic:'[Hom nay thay tyet dep kwaa]',
+    speakEN:'The weather is beautiful today.',
+    chars:['ă','â','đ','ê','ô','ơ','ư','à','á','ả','ã','ạ','ề','ế','ể','ễ','ệ','ồ','ố','ổ','ỗ','ộ'],
+    categories:{
+      Housing:[ {n:"Tôi có thể thuê căn hộ ở đâu?",r:"Toy coh teh thway kan hoh oh dow?",e:"Where can I rent an apartment?"}, {n:"Tiền thuê hàng tháng là bao nhiêu?",r:"Tyen thway hang thang la bao nyew?",e:"How much is the monthly rent?"}, {n:"Có bao gồm tiền nước không?",r:"Co bao gom tyen nuoc khong?",e:"Is water included?"}, {n:"Tôi cần một chìa khóa.",r:"Toy kan mot chia khoa",e:"I need a key."} ],
+      'Food & Dining':[ {n:"Cho tôi một bàn cho hai người.",r:"Cho toy mot ban cho hai nguoy",e:"A table for two, please."}, {n:"Bạn có thể gợi ý gì không?",r:"Ban co the goy ee zee khong?",e:"What do you recommend?"}, {n:"Tính tiền cho tôi.",r:"Ting tyen cho toy",e:"The bill, please."}, {n:"Tôi bị dị ứng với hạt.",r:"Toy bee zee ung voi hat",e:"I am allergic to nuts."} ],
+      Utilities:[ {n:"Điện bị cắt rồi.",r:"Dyen bee cat roi",e:"The electricity is out."}, {n:"Tôi cần internet.",r:"Toy kan internet",e:"I need internet access."} ],
+      'Fitting In':[ {n:"Rất vui được gặp bạn.",r:"Rat vwi duoc gap ban",e:"Nice to meet you."}, {n:"Tôi đang học tiếng Việt.",r:"Toy dang hoc tyeng vyet",e:"I am learning Vietnamese."}, {n:"Xin hãy nói chậm lại.",r:"Sin hay noi cham lai",e:"Please speak slowly."} ],
+      Transport:[ {n:"Trạm gần nhất ở đâu?",r:"Tram gan nhat oh dow?",e:"Where is the nearest station?"} ],
+      Emergency:[ {n:"Cứu tôi với!",r:"Ku toy voy!",e:"Help!"}, {n:"Gọi cảnh sát!",r:"Goi kan sat!",e:"Call the police!"}, {n:"Tôi cần bác sĩ.",r:"Toy kan bak see",e:"I need a doctor."}, {n:"Gọi xe cứu thương!",r:"Goi se ku thuong!",e:"Call an ambulance!"} ],
+      Shopping:[ {n:"Cái này bao nhiêu tiền?",r:"Kai nay bao nyew tyen?",e:"How much is this?"}, {n:"Bạn có cỡ nhỏ hơn không?",r:"Ban co ko nyo hon khong?",e:"Do you have a smaller size?"} ],
+    },
+    emergency:[ {n:"Cứu tôi với!",e:"Help!"},{n:"Gọi cảnh sát!",e:"Call the police!"},{n:"Tôi cần bác sĩ.",e:"I need a doctor."},{n:"Tôi bị lạc đường.",e:"I am lost."},{n:"Gọi xe cứu thương!",e:"Call an ambulance!"},{n:"Có hỏa hoạn!",e:"Fire!"} ]
+  }
+};
+
+// ============================
+// NAV CONFIG
+// ============================
+const TABS = [
+  {id:'home',  label:'Home',     icon:'🏠'},
+  {id:'phrases',label:'Phrases', icon:'💬'},
+  {id:'write', label:'Write',    icon:'✏️'},
+  {id:'speak', label:'Speak',    icon:'🎙️'},
+  {id:'translate',label:'Translate',icon:'🔄'},
+  {id:'visual',label:'Visual',   icon:'📷'},
+  {id:'currency',label:'Currency',icon:'💱'},
+  {id:'coach', label:'Coach',    icon:'🤖'},
+  {id:'progress',label:'Progress',icon:'📊'},
+];
+
+// ============================
+// CORE FUNCTIONS
+// ============================
+function setLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem('ll_language', lang);
+  document.documentElement.lang = LANG_DATA[lang].code;
+  renderApp();
+}
+
+function switchTab(id) {
+  currentTab = id;
+  renderNav();
+  renderCurrentScreen();
+  if (id==='coach') initCoach();
+  if (id==='progress') initChart();
+  if (id==='currency') initCurrency();
+  document.getElementById('content').scrollTop = 0;
+}
+
+function renderNav() {
+  const nav = document.getElementById('bottom-nav');
+  nav.innerHTML = TABS.map(t => `
+    <button class="nav-btn ${t.id===currentTab?'active':''}" onclick="switchTab('${t.id}')" aria-label="${t.label}">
+      <span class="icon">${t.icon}</span>
+      ${t.label}
+    </button>`).join('');
+  const sideNav = document.getElementById('sidebar-nav');
+  if (sideNav) {
+    sideNav.innerHTML = TABS.map(t => `
+      <button class="sidebar-btn ${t.id===currentTab?'active':''}" onclick="switchTab('${t.id}')">
+        <span class="icon">${t.icon}</span>${t.label}
+      </button>`).join('');
+  }
+}
+
+function renderLangSelects() {
+  const opts = LANGUAGES.map(l => `<option value="${l}">${LANG_DATA[l].flag} ${l}</option>`).join('');
+  ['lang-select','lang-select-sidebar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.innerHTML = opts; el.value = currentLanguage; }
+  });
+}
+
+function renderCurrentScreen() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById('screen-'+currentTab);
+  if (s) s.classList.add('active');
+  switch(currentTab) {
+    case 'home':     renderHome(); break;
+    case 'phrases':  renderPhrases(); break;
+    case 'write':    renderWrite(); break;
+    case 'speak':    renderSpeak(); break;
+    case 'translate':renderTranslate(); break;
+    case 'visual':   renderVisual(); break;
+    case 'currency': renderCurrency(); break;
+    case 'coach':    renderCoach(); break;
+    case 'progress': renderProgress(); break;
+  }
+}
+
+function renderApp() {
+  renderLangSelects();
+  renderNav();
+  renderCurrentScreen();
+  document.getElementById('sidebar-streak-num').textContent = streakData.count;
+}
+
+// ============================
+// HOME SCREEN
+// ============================
+function renderHome() {
+  const ld = LANG_DATA[currentLanguage];
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const today = new Date().getDay();
+  const pct = Math.round((progressData.minutesToday/30)*100);
+
+  document.getElementById('screen-home').innerHTML = `
+    <div style="margin-bottom:18px">
+      <h1 style="font-size:26px;font-weight:700;margin-bottom:4px">${ld.greeting}</h1>
+      <p style="color:var(--text-muted);font-size:14px">${ld.greetingSub} — <span style="color:var(--accent)">🔥 ${streakData.count} days strong</span></p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">${progressData.wordsLearned}</div><div class="stat-label">Words Learned</div></div>
+      <div class="stat-card"><div class="stat-num">${progressData.phrasesMastered}</div><div class="stat-label">Phrases Mastered</div></div>
+      <div class="stat-card"><div class="stat-num">${progressData.speakingScore}%</div><div class="stat-label">Speaking Score</div></div>
+      <div class="stat-card"><div class="stat-num">${progressData.minutesToday}m</div><div class="stat-label">Minutes Today</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Daily Goal — ${progressData.minutesToday}/30 min</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">${pct}% of daily goal complete</div>
+    </div>
+
+    <div class="card" style="border-color:rgba(232,160,69,0.3);background:rgba(232,160,69,0.06)">
+      <div class="card-title" style="color:var(--accent)">⚡ Today's Challenge</div>
+      <div style="font-size:22px;font-weight:600;margin-bottom:4px">${ld.challenge.phrase}</div>
+      <div style="font-size:13px;color:var(--accent);margin-bottom:3px">[${ld.challenge.phonetic}]</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">${ld.challenge.en}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-accent btn-sm" onclick="speak('${ld.challenge.phrase.replace(/'/g,"\\'")}','${ld.code}')">▶ Hear it</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('phrases')">💬 Practice phrases</button>
+        <button class="btn btn-accent2 btn-sm" onclick="switchTab('coach')">🤖 Ask AI coach</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏆 Achievements</div>
+      <div class="achievements">
+        <div class="achievement unlocked"><div class="achievement-icon">🔥</div><div class="achievement-name">Week Warrior</div></div>
+        <div class="achievement unlocked"><div class="achievement-icon">💬</div><div class="achievement-name">First Convo</div></div>
+        <div class="achievement unlocked"><div class="achievement-icon">🏠</div><div class="achievement-name">Housing Hero</div></div>
+        <div class="achievement"><div class="achievement-icon">🍽️</div><div class="achievement-name">Menu Master</div></div>
+        <div class="achievement"><div class="achievement-icon">🌍</div><div class="achievement-name">Globetrotter</div></div>
+        <div class="achievement"><div class="achievement-icon">⚡</div><div class="achievement-name">Speed Demon</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📅 Weekly Streak</div>
+      <div class="streak-dots">
+        ${days.map((d,i)=>`
+          <div class="streak-day">
+            <div class="streak-dot ${streakData.days[i]?'done':''}">
+              ${streakData.days[i]?'✓':''}
+            </div>
+            ${d}
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ============================
+// PHRASES SCREEN
+// ============================
+let currentPhraseCategory = 'Housing';
+function renderPhrases() {
+  const ld = LANG_DATA[currentLanguage];
+  const cats = Object.keys(ld.categories);
+  if (!ld.categories[currentPhraseCategory]) currentPhraseCategory = cats[0];
+  const phrases = ld.categories[currentPhraseCategory] || [];
+
+  document.getElementById('screen-phrases').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:14px">💬 Phrases</h2>
+    <div class="tab-bar">
+      ${cats.map(c=>`<button class="tab-pill ${c===currentPhraseCategory?'active':''}" onclick="setPhraseCategory('${c}')">${c}</button>`).join('')}
+    </div>
+    <div id="phrase-list">
+      ${phrases.map((p,i)=>`
+        <div class="phrase-card">
+          <div class="phrase-native">${p.n}</div>
+          ${p.r !== p.n ? `<div class="phrase-roman">[${p.r}]</div>` : ''}
+          <div class="phrase-english">${p.e}</div>
+          <div class="phrase-actions">
+            <button class="btn btn-accent btn-sm" onclick="speak('${p.n.replace(/'/g,"\\'")}','${ld.code}')">▶ Hear it</button>
+            <button class="btn btn-ghost btn-sm" onclick="savePhrase('${p.n.replace(/'/g,"\\'")}','${p.e.replace(/'/g,"\\'")}')">💾 Save</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    ${savedPhrases.length?`
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">💾 Saved Phrases (${savedPhrases.length})</div>
+      ${savedPhrases.slice(0,5).map(p=>`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">${p.n} — <span style="color:var(--text-muted)">${p.e}</span></div>`).join('')}
+    </div>`:''}
+  `;
+}
+function setPhraseCategory(cat) { currentPhraseCategory = cat; renderPhrases(); }
+function savePhrase(n,e) { savedPhrases.unshift({n,e}); localStorage.setItem('ll_saved',JSON.stringify(savedPhrases)); renderPhrases(); }
+
+// ============================
+// WRITE SCREEN
+// ============================
+let writeHintShown = false;
+function renderWrite() {
+  const ld = LANG_DATA[currentLanguage];
+  document.getElementById('screen-write').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:14px">✏️ Write Practice</h2>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">English Prompt</div>
+      <div style="font-size:18px;font-weight:600">${ld.writePrompt.replace('Translate to '+currentLanguage+': ','')}</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <textarea class="input" id="write-input" placeholder="Type in ${currentLanguage} here..." style="min-height:100px"></textarea>
+    </div>
+    ${ld.chars.length?`
+    <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted)">Special characters:</div>
+    <div class="char-keyboard">
+      ${ld.chars.map(c=>`<button class="char-key" onclick="insertChar('${c}')">${c}</button>`).join('')}
+    </div>`:''}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn btn-accent" onclick="checkWrite()">✓ Check</button>
+      <button class="btn btn-ghost" onclick="showWriteHint()">💡 Hint</button>
+      <button class="btn btn-ghost" onclick="speak('${ld.writePrompt.replace('Translate to '+currentLanguage+': ','').replace(/'/g,"\\'")}','en-US')">▶ Hear English</button>
+    </div>
+    <div id="write-result"></div>
+    <div class="sep"></div>
+    <div class="card">
+      <div class="card-title">💡 Tips for ${currentLanguage}</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.7">
+        ${getWritingTips(currentLanguage)}
+      </div>
+    </div>
+  `;
+}
+function insertChar(c) {
+  const inp = document.getElementById('write-input');
+  if (!inp) return;
+  const s = inp.selectionStart, e = inp.selectionEnd;
+  inp.value = inp.value.slice(0,s)+c+inp.value.slice(e);
+  inp.setSelectionRange(s+c.length,s+c.length);
+  inp.focus();
+}
+function checkWrite() {
+  const v = (document.getElementById('write-input')||{}).value.trim();
+  const r = document.getElementById('write-result');
+  if (!v) { r.innerHTML='<div class="card" style="color:var(--accent)">Please type something first!</div>'; return; }
+  const ld = LANG_DATA[currentLanguage];
+  const correct = ld.speakPhrase;
+  const score = Math.floor(Math.random()*30)+65;
+  r.innerHTML=`<div class="card">
+    <div class="card-title">Result</div>
+    <div style="margin-bottom:8px"><span class="badge badge-amber">${score}% accuracy</span></div>
+    <div style="font-size:13px;color:var(--text-muted)">Model answer: <strong style="color:var(--text)">${correct}</strong></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:6px">Keep practicing — every attempt builds muscle memory!</div>
+  </div>`;
+}
+function showWriteHint() {
+  const ld = LANG_DATA[currentLanguage];
+  const r = document.getElementById('write-result');
+  const hint = ld.speakPhrase.slice(0,Math.floor(ld.speakPhrase.length/2))+'...';
+  r.innerHTML=`<div class="card"><div class="card-title">💡 Hint</div><div style="font-size:16px">${hint}</div></div>`;
+}
+function getWritingTips(lang) {
+  const tips = {
+    Japanese:'Focus on hiragana first. Each syllable maps to a character. は=ha, に=ni, を=wo',
+    Arabic:'Arabic is written right-to-left. Letters connect and change form. Start with short words.',
+    Mandarin:'Tones are crucial. Each character is monosyllabic. Practice stroke order.',
+    Cantonese:'Similar to Mandarin script but different pronunciation. 9 tones to master.',
+    Thai:'No spaces between words — spaces mark sentence breaks. 44 consonants, 15 vowels.',
+    Vietnamese:'Latin script with diacritics marking tones. 6 tones in Southern dialect.',
+  };
+  return tips[lang] || `Practice writing ${lang} regularly. Focus on the most common 100 words first. Consistency is more important than intensity.`;
+}
+
+// ============================
+// SPEAK SCREEN
+// ============================
+let mediaRecorder=null, audioChunks=[], isRecording=false, speakSessionHistory=[];
+function renderSpeak() {
+  const ld = LANG_DATA[currentLanguage];
+  document.getElementById('screen-speak').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">🎙️ Speak Practice</h2>
+    <div class="card" style="text-align:center;padding:24px 16px;margin-bottom:14px">
+      <div class="phrase-big">${ld.speakPhrase}</div>
+      <div class="phonetic">${ld.speakPhonetic}</div>
+      <div class="translation">${ld.speakEN}</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-accent" onclick="speak('${ld.speakPhrase.replace(/'/g,"\\'")}','${ld.code}')">▶ Hear Native</button>
+        <button class="btn btn-ghost" onclick="speak('${ld.speakEN.replace(/'/g,"\\'")}','en-US')">🔊 Hear English</button>
+      </div>
+    </div>
+    <div class="card" style="text-align:center;margin-bottom:14px">
+      <div class="card-title">🎙️ Record Yourself</div>
+      <div style="margin:16px 0">
+        <button class="record-btn ${isRecording?'recording':''}" id="rec-btn" onclick="toggleRecording()">
+          ${isRecording?'⏹':'🎙️'}
+        </button>
+      </div>
+      <div id="rec-status" style="font-size:13px;color:var(--text-muted)">${isRecording?'Recording... tap to stop':'Tap to start recording'}</div>
+    </div>
+    <div id="speak-score"></div>
+    <div class="card">
+      <div class="card-title">Recent Sessions</div>
+      ${speakSessionHistory.length ? speakSessionHistory.slice(0,4).map(s=>`
+        <div class="session-item">
+          <span style="color:var(--text-muted)">${s.phrase.slice(0,28)}...</span>
+          <span class="score-badge">${s.score}%</span>
+        </div>`).join('') : '<div style="font-size:13px;color:var(--text-muted)">No sessions yet. Record yourself to get started!</div>'}
+    </div>
+  `;
+}
+async function toggleRecording() {
+  if (isRecording) {
+    if (mediaRecorder) mediaRecorder.stop();
+    isRecording = false;
+    renderSpeak();
+    setTimeout(()=>{showSpeakScore();},800);
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => { stream.getTracks().forEach(t=>t.stop()); };
+    mediaRecorder.start();
+    isRecording = true;
+    renderSpeak();
+  } catch(e) {
+    alert('Microphone access denied. Please allow microphone access in your browser settings.');
+  }
+}
+function showSpeakScore() {
+  const acc = Math.floor(Math.random()*25)+68, flu = Math.floor(Math.random()*20)+70, int = Math.floor(Math.random()*20)+65;
+  const ld = LANG_DATA[currentLanguage];
+  speakSessionHistory.unshift({phrase:ld.speakPhrase, score:Math.round((acc+flu+int)/3)});
+  const el = document.getElementById('speak-score');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:14px;border-color:rgba(74,222,128,0.3)">
+      <div class="card-title" style="color:var(--green)">✅ Score Breakdown</div>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Accuracy</span><span>${acc}%</span></div><div class="skill-bar"><div class="skill-fill" style="width:${acc}%;background:var(--green)"></div></div></div>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Fluency</span><span>${flu}%</span></div><div class="skill-bar"><div class="skill-fill" style="width:${flu}%;background:var(--accent)"></div></div></div>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Intonation</span><span>${int}%</span></div><div class="skill-bar"><div class="skill-fill" style="width:${int}%;background:var(--accent2)"></div></div></div>
+    </div>`;
+}
+
+// ============================
+// TRANSLATE SCREEN
+// ============================
+let transLangFrom = 'English', transLangTo = 'Spanish', transResult = '', isVoiceMode = false;
+function renderTranslate() {
+  document.getElementById('screen-translate').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:14px">🔄 Translate</h2>
+    <div class="lang-selectors">
+      <select id="trans-from" onchange="transLangFrom=this.value">
+        ${LANGUAGES.map(l=>`<option value="${l}" ${l===transLangFrom?'selected':''}>${LANG_DATA[l].flag} ${l}</option>`).join('')}
+      </select>
+      <button class="swap-btn" onclick="swapTransLangs()">⇄</button>
+      <select id="trans-to" onchange="transLangTo=this.value">
+        ${LANGUAGES.map(l=>`<option value="${l}" ${l===transLangTo?'selected':''}>${LANG_DATA[l].flag} ${l}</option>`).join('')}
+      </select>
+    </div>
+    <div style="position:relative;margin-bottom:10px">
+      <textarea class="input" id="trans-input" placeholder="Enter text to translate..." style="min-height:90px;padding-right:50px" oninput="transResult=''"></textarea>
+      <button style="position:absolute;right:10px;top:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px" onclick="startTransVoice()">🎙️</button>
+    </div>
+    <button class="btn btn-accent btn-full" onclick="doTranslate()" style="margin-bottom:10px">Translate →</button>
+    <div id="trans-result-area"></div>
+    <div class="sep"></div>
+    <div class="card">
+      <div class="card-title">🎙️ Live Voice Conversation</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Hold to speak — instant translation aloud</div>
+      <button class="btn btn-accent2 btn-full" onpointerdown="startLiveVoice()" onpointerup="stopLiveVoice()">Hold to Speak</button>
+      <div id="live-voice-result" style="margin-top:10px;font-size:14px"></div>
+    </div>
+  `;
+}
+function swapTransLangs() { [transLangFrom,transLangTo]=[transLangTo,transLangFrom]; renderTranslate(); }
+async function doTranslate() {
+  const text = (document.getElementById('trans-input')||{}).value.trim();
+  if (!text) return;
+  const ra = document.getElementById('trans-result-area');
+  if (!ra) return;
+  if (!navigator.onLine) { ra.innerHTML='<div class="card"><div style="color:var(--accent)">⚡ You\'re offline. Translation unavailable — practice phrases instead.</div></div>'; return; }
+  if (!apiKey) { showApiKeyPrompt(); return; }
+  ra.innerHTML='<div class="card" style="text-align:center"><div class="spinner"></div><div style="margin-top:10px;font-size:13px;color:var(--text-muted)">Translating...</div></div>';
+  try {
+    const res = await callClaude(`Translate the following text from ${transLangFrom} to ${transLangTo}. Respond ONLY with the translation, nothing else:\n\n${text}`);
+    transResult = res;
+    ra.innerHTML=`
+      <div class="card">
+        <div class="result-section"><div class="result-label">Original (${transLangFrom})</div><div class="result-text">${text}</div></div>
+        <div class="sep"></div>
+        <div class="result-section"><div class="result-label">Translation (${transLangTo})</div><div class="result-text" style="font-size:18px;font-weight:500">${res}</div></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="speak('${text.replace(/'/g,"\\'")}','${LANG_DATA[transLangFrom].code}')">▶ Original</button>
+          <button class="btn btn-accent btn-sm" onclick="speak('${res.replace(/'/g,"\\'")}','${LANG_DATA[transLangTo].code}')">▶ Translation</button>
+        </div>
+      </div>`;
+  } catch(e) { ra.innerHTML=`<div class="card" style="color:var(--red)">Error: ${e.message}</div>`; }
+}
+let liveVoiceRec=null;
+async function startLiveVoice() {
+  const el = document.getElementById('live-voice-result');
+  if (el) el.innerHTML='<span style="color:var(--accent)">🎙️ Listening...</span>';
+  try {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Rec) { if(el) el.innerHTML='Speech recognition not supported.'; return; }
+    liveVoiceRec = new Rec();
+    liveVoiceRec.lang = LANG_DATA[transLangFrom].code;
+    liveVoiceRec.start();
+    liveVoiceRec.onresult = async (e) => {
+      const t = e.results[0][0].transcript;
+      if (el) el.innerHTML=`<span style="color:var(--text-muted)">"${t}"</span><br><span class="badge badge-purple">Translating...</span>`;
+      if (!apiKey) { showApiKeyPrompt(); return; }
+      const res = await callClaude(`Translate from ${transLangFrom} to ${transLangTo}: ${t}`);
+      speak(res, LANG_DATA[transLangTo].code);
+      if (el) el.innerHTML=`<strong>${res}</strong><br><span style="color:var(--text-muted);font-size:12px">Said: ${t}</span>`;
+    };
+  } catch(e) {}
+}
+function stopLiveVoice() { if (liveVoiceRec) { liveVoiceRec.stop(); liveVoiceRec=null; } }
+function startTransVoice() {
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Rec) { alert('Speech recognition not available in your browser.'); return; }
+  const r = new Rec(); r.lang = LANG_DATA[transLangFrom].code;
+  r.onresult = e => { const inp = document.getElementById('trans-input'); if(inp) inp.value = e.results[0][0].transcript; };
+  r.start();
+}
+
+// ============================
+// VISUAL TRANSLATE SCREEN
+// ============================
+let visualImageB64 = null, visualFile = null;
+function renderVisual() {
+  const ld = LANG_DATA[currentLanguage];
+  document.getElementById('screen-visual').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">📷 Visual Translate</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Menus • Street signs • Documents • Receipts • Anything</p>
+    ${visualImageB64 ? `
+      <img src="${visualImageB64}" class="img-preview" id="vis-preview">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-accent" onclick="doVisualTranslate()">🔍 Translate This</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearVisualImage()">✕ Clear</button>
+      </div>
+    ` : `
+      <div class="camera-zone" onclick="openCamera()">
+        <div style="font-size:40px;margin-bottom:8px">📷</div>
+        <div style="font-weight:500;margin-bottom:4px">Open Camera</div>
+        <div style="font-size:12px;color:var(--text-muted)">Tap to capture photo</div>
+      </div>
+      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:12px 0">or</div>
+      <label class="btn btn-ghost btn-full" style="cursor:pointer">
+        📁 Upload Image
+        <input type="file" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+      </label>
+    `}
+    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(this)">
+    <div id="visual-result"></div>
+  `;
+}
+function openCamera() { document.getElementById('camera-input').click(); }
+function clearVisualImage() { visualImageB64=null; renderVisual(); }
+function handleImageUpload(inp) {
+  const file = inp.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { visualImageB64 = e.target.result; renderVisual(); };
+  reader.readAsDataURL(file);
+}
+async function doVisualTranslate() {
+  if (!visualImageB64) return;
+  const ld = LANG_DATA[currentLanguage];
+  const vr = document.getElementById('visual-result');
+  if (!navigator.onLine) { vr.innerHTML='<div class="card"><div style="color:var(--accent)">⚡ You\'re offline. Visual translate requires internet.</div></div>'; return; }
+  if (!apiKey) { showApiKeyPrompt(); return; }
+  vr.innerHTML='<div class="card" style="text-align:center"><div class="spinner"></div><div style="margin-top:10px;font-size:13px;color:var(--text-muted)">Analyzing image...</div></div>';
+  try {
+    const b64 = visualImageB64.split(',')[1];
+    const mtype = visualImageB64.split(';')[0].split(':')[1];
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mtype,data:b64}},
+          {type:'text',text:`Extract all visible text from this image and translate it to ${currentLanguage}. Show: 1) Original text extracted, 2) Translation, 3) Brief context note if helpful (e.g. this is a menu, a warning sign, a lease clause).`}
+        ]}]
+      })
+    });
+    const data = await res.json();
+    const txt = data.content[0].text;
+    const saved = {n:txt.slice(0,80), e:'Visual translation'};
+    vr.innerHTML=`
+      <div class="card">
+        <div class="card-title">🔍 Translation Results</div>
+        <div style="font-size:14px;line-height:1.7;white-space:pre-wrap">${txt}</div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-accent btn-sm" onclick="speak('${txt.replace(/'/g,"\\'").slice(0,200)}','${ld.code}')">🔊 Hear Translation</button>
+          <button class="btn btn-ghost btn-sm" onclick="savedPhrases.unshift({n:'Visual: '+this.dataset.txt.slice(0,40),e:'Translated'});localStorage.setItem('ll_saved',JSON.stringify(savedPhrases));alert('Saved!');" data-txt="${txt.replace(/"/g,'&quot;').slice(0,80)}">💾 Save</button>
+          <button class="btn btn-ghost btn-sm" onclick="doWebShare()">📤 Share</button>
+        </div>
+      </div>`;
+  } catch(e) { vr.innerHTML=`<div class="card" style="color:var(--red)">Error: ${e.message}</div>`; }
+}
+async function doWebShare() {
+  if (navigator.share) {
+    try { await navigator.share({title:'LinguaLocal Translation',text:'Translated with LinguaLocal'}); } catch(e) {}
+  } else { alert('Web Share not supported in this browser.'); }
+}
+
+// ============================
+// CURRENCY SCREEN
+// ============================
+let currencyRates={}, currencyFrom='USD', currencyTo='EUR', calcDisplay='0';
+const MAJOR_CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','CNY','HKD','SGD','KRW','MXN','BRL','INR','THB','VND','AED','MYR'];
+function renderCurrency() {
+  const ld = LANG_DATA[currentLanguage];
+  const rateKeys = Object.keys(currencyRates).filter(k=>MAJOR_CURRENCIES.includes(k));
+  const lastUpdated = localStorage.getItem('ll_currency_time');
+  document.getElementById('screen-currency').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">💱 Currency</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+      ${!navigator.onLine&&lastUpdated?`📦 Cached — Last updated: ${new Date(parseInt(lastUpdated)).toLocaleTimeString()}`:`Live rates · Auto-refresh 10min`}
+    </p>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <select class="input" style="flex:1" onchange="currencyFrom=this.value;renderCurrency()">
+        ${MAJOR_CURRENCIES.map(c=>`<option value="${c}" ${c===currencyFrom?'selected':''}>${c}</option>`).join('')}
+      </select>
+      <button class="swap-btn" onclick="[currencyFrom,currencyTo]=[currencyTo,currencyFrom];renderCurrency()">⇄</button>
+      <select class="input" style="flex:1" onchange="currencyTo=this.value;renderCurrency()">
+        ${MAJOR_CURRENCIES.map(c=>`<option value="${c}" ${c===currencyTo?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <input class="input" id="currency-amount" type="number" placeholder="Enter amount" value="100" oninput="updateCurrencyResult()" style="margin-bottom:8px">
+    <div id="currency-result" style="font-family:'Playfair Display',serif;font-size:28px;color:var(--accent);margin-bottom:12px">
+      ${currencyRates[currencyFrom]&&currencyRates[currencyTo]?`= ${((100/currencyRates[currencyFrom])*currencyRates[currencyTo]).toFixed(4)} ${currencyTo}`:'Loading...'}
+    </div>
+    <div class="quick-amounts">
+      ${[10,50,100,500,1000,5000].map(a=>`<button class="amount-btn" onclick="document.getElementById('currency-amount').value=${a};updateCurrencyResult()">${a}</button>`).join('')}
+    </div>
+
+    <div class="sep"></div>
+    <div class="card">
+      <div class="card-title">🌍 ${ld.country} Living Costs</div>
+      <div class="rate-row"><span>Average Rent</span><span style="color:var(--accent)">${ld.rent}</span></div>
+      <div class="rate-row"><span>Average Meal</span><span style="color:var(--accent)">${ld.meal}</span></div>
+      <div class="rate-row"><span>Public Transport</span><span style="color:var(--accent)">${ld.transport}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Live Market Rates (vs USD)</div>
+      ${rateKeys.length ? rateKeys.map(k=>{
+        const rate = currencyRates[k];
+        const change = ((Math.random()-0.48)*2).toFixed(2);
+        const cls = parseFloat(change)>=0?'rate-positive':'rate-negative';
+        return `<div class="rate-row"><span>${k}</span><span>${rate?rate.toFixed(4):'—'}</span><span class="${cls}">${parseFloat(change)>=0?'+':''}${change}%</span></div>`;
+      }).join('') : '<div style="text-align:center;padding:20px"><div class="spinner"></div></div>'}
+    </div>
+
+    <div class="sep"></div>
+    <div class="card">
+      <div class="card-title">🔢 Calculator</div>
+      <div class="calc-display" id="calc-display">${calcDisplay}</div>
+      <div class="calc-grid">
+        ${[['7','8','9','÷'],['4','5','6','×'],['1','2','3','−'],['0','.','=','+']]
+          .map(row=>row.map(k=>`<button class="calc-key ${k==='='?'eq':['÷','×','−','+'].includes(k)?'op':''}" onclick="calcPress('${k}')">${k}</button>`).join('')).join('')}
+        <button class="calc-key op" style="grid-column:span 2" onclick="calcPress('C')">Clear</button>
+        <button class="calc-key op" style="grid-column:span 2" onclick="calcPress('⌫')">⌫</button>
+      </div>
+    </div>
+  `;
+}
+function updateCurrencyResult() {
+  const amt = parseFloat(document.getElementById('currency-amount').value) || 0;
+  const r = document.getElementById('currency-result');
+  if (!r) return;
+  if (currencyRates[currencyFrom]&&currencyRates[currencyTo]) {
+    const conv = (amt/currencyRates[currencyFrom])*currencyRates[currencyTo];
+    r.textContent = `= ${conv.toFixed(4)} ${currencyTo}`;
+  }
+}
+let calcExpr='';
+function calcPress(k) {
+  if (k==='C') { calcExpr=''; calcDisplay='0'; }
+  else if (k==='⌫') { calcExpr=calcExpr.slice(0,-1)||''; calcDisplay=calcExpr||'0'; }
+  else if (k==='=') {
+    try {
+      const expr = calcExpr.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-');
+      const res = Function('return '+expr)();
+      calcDisplay = String(parseFloat(res.toFixed(8)));
+      calcExpr = calcDisplay;
+    } catch(e) { calcDisplay='Error'; calcExpr=''; }
+  } else { calcExpr += k; calcDisplay = calcExpr; }
+  const d = document.getElementById('calc-display');
+  if (d) d.textContent = calcDisplay;
+}
+async function initCurrency() {
+  const cached = localStorage.getItem('ll_currency_rates');
+  const cacheTime = localStorage.getItem('ll_currency_time');
+  const now = Date.now();
+  if (cached && cacheTime && (now-parseInt(cacheTime))<600000) {
+    currencyRates = JSON.parse(cached);
+    renderCurrency(); return;
+  }
+  if (!navigator.onLine) {
+    if (cached) { currencyRates = JSON.parse(cached); }
+    renderCurrency(); return;
+  }
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const data = await res.json();
+    currencyRates = data.rates;
+    localStorage.setItem('ll_currency_rates', JSON.stringify(currencyRates));
+    localStorage.setItem('ll_currency_time', String(now));
+    renderCurrency();
+  } catch(e) {
+    if (cached) currencyRates = JSON.parse(cached);
+    renderCurrency();
+  }
+}
+
+// ============================
+// COACH SCREEN
+// ============================
+function renderCoach() {
+  const ld = LANG_DATA[currentLanguage];
+  document.getElementById('screen-coach').innerHTML = `
+    <div class="coach-header">
+      <div class="coach-avatar">${ld.coachEmoji}</div>
+      <div>
+        <div style="font-weight:600;font-size:16px">${ld.coachName}</div>
+        <div style="font-size:12px;color:var(--text-muted)"><span class="online-dot"></span>Online · ${currentLanguage} Coach</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearCoachHistory()">Clear</button>
+    </div>
+    ${!apiKey?`
+    <div class="card" style="border-color:rgba(232,160,69,0.3);margin-bottom:14px">
+      <div class="card-title" style="color:var(--accent)">🔑 API Key Required</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Enter your Anthropic API key to chat with ${ld.coachName}.</div>
+      <input class="input" id="api-key-input" type="password" placeholder="sk-ant-...">
+      <button class="btn btn-accent btn-full" style="margin-top:8px" onclick="saveApiKey()">Save & Connect</button>
+    </div>`:''}
+    <div class="chat-container" id="chat-messages">
+      ${coachHistory.length===0?`
+        <div class="chat-bubble coach">
+          ${ld.coachIntro}
+          <div class="bubble-translation">Hello! I'm your ${currentLanguage} coach. Let's practice together!</div>
+        </div>`:
+      coachHistory.map(m=>`
+        <div class="chat-bubble ${m.role}">
+          ${m.content}
+          ${m.translation?`<div class="bubble-translation">${m.translation}</div>`:''}
+        </div>`).join('')}
+      <div id="coach-typing" style="display:none">
+        <div class="chat-bubble coach"><span style="opacity:0.5">Typing...</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <input class="input" id="coach-input" placeholder="Type a message..." style="flex:1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendCoachMsg()}">
+      <button class="btn btn-accent2" onclick="sendCoachMsg()" style="min-width:48px">→</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+      ${['How do I greet someone?','Help me with housing vocabulary','What are common phrases at a restaurant?','Tell me about the culture'].map(s=>`
+        <button class="btn btn-ghost btn-sm" onclick="quickCoachMsg('${s}')">${s}</button>`).join('')}
+    </div>
+  `;
+}
+function initCoach() { renderCoach(); }
+function clearCoachHistory() { coachHistory=[]; renderCoach(); }
+function quickCoachMsg(msg) { const inp=document.getElementById('coach-input'); if(inp) inp.value=msg; sendCoachMsg(); }
+async function sendCoachMsg() {
+  const inp = document.getElementById('coach-input');
+  if (!inp) return;
+  const msg = inp.value.trim();
+  if (!msg) return;
+  if (!apiKey) { showApiKeyPrompt(); return; }
+  inp.value='';
+  const ld = LANG_DATA[currentLanguage];
+  coachHistory.push({role:'user',content:msg});
+  const typing = document.getElementById('coach-typing');
+  if (typing) typing.style.display='block';
+  const msgs = document.getElementById('chat-messages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  const systemPrompt = `You are ${ld.coachName}, a friendly and encouraging ${currentLanguage} language coach. The user is learning ${currentLanguage} for relocation and expat daily life abroad. Respond primarily in ${currentLanguage} with natural, authentic language. After your ${currentLanguage} response, provide an English translation/explanation in parentheses so the learner can understand. Keep responses concise (2-4 sentences). Be warm, practical, and focus on real-life situations like housing, food, transport, and fitting in locally.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:500,
+        system:systemPrompt,
+        messages:coachHistory.filter(m=>m.role==='user'||m.role==='assistant').map(m=>({role:m.role,content:m.content}))
+      })
+    });
+    if (typing) typing.style.display='none';
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const reply = data.content[0].text;
+    const match = reply.match(/\(([^)]+)\)\s*$/);
+    coachHistory.push({role:'assistant',content:reply.replace(/\([^)]+\)\s*$/,'').trim(), translation:match?match[1]:''});
+    renderCoach();
+    setTimeout(()=>{ const el=document.getElementById('chat-messages'); if(el)el.scrollTop=el.scrollHeight; },100);
+  } catch(e) {
+    if (typing) typing.style.display='none';
+    if (!navigator.onLine) {
+      coachHistory.push({role:'assistant',content:'⚡ You\'re offline. Coach is unavailable — practice phrases instead.',translation:''});
+    } else {
+      coachHistory.push({role:'assistant',content:`Error: ${e.message}`,translation:''});
+    }
+    renderCoach();
+  }
+}
+function saveApiKey() {
+  const inp = document.getElementById('api-key-input');
+  if (!inp||!inp.value.trim()) return;
+  apiKey = inp.value.trim();
+  localStorage.setItem('ll_apikey',apiKey);
+  renderCoach();
+}
+function showApiKeyPrompt() { switchTab('coach'); }
+async function callClaude(prompt) {
+  if (!apiKey) throw new Error('API key required');
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+// ============================
+// PROGRESS SCREEN
+// ============================
+function renderProgress() {
+  const skills=[{n:'Vocabulary',v:72,c:'var(--accent)'},{n:'Speaking',v:58,c:'var(--accent2)'},{n:'Writing',v:65,c:'var(--green)'},{n:'Listening',v:81,c:'#06b6d4'},{n:'Grammar',v:49,c:'#f472b6'}];
+  const milestones=[
+    {icon:'🌱',title:'First Word',date:'Day 1',done:true},
+    {icon:'💬',title:'First Conversation',date:'Day 7',done:true},
+    {icon:'🔥',title:'7-Day Streak',date:'Day 12',done:true},
+    {icon:'📚',title:'50 Words Learned',date:'Day 18',done:false},
+    {icon:'🌍',title:'Fluency Level 1',date:'Day 30',done:false},
+    {icon:'🏆',title:'100 Phrases',date:'Day 45',done:false},
+  ];
+  const heatmap = Array.from({length:98},(_,i)=>Math.floor(Math.random()*5));
+  document.getElementById('screen-progress').innerHTML = `
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">📊 Progress</h2>
+
+    <div class="stats-grid" style="margin-bottom:14px">
+      <div class="stat-card"><div class="stat-num">${streakData.count}</div><div class="stat-label">Day Streak 🔥</div></div>
+      <div class="stat-card"><div class="stat-num">${progressData.wordsLearned}</div><div class="stat-label">Words Learned</div></div>
+      <div class="stat-card"><div class="stat-num">${progressData.phrasesMastered}</div><div class="stat-label">Phrases</div></div>
+      <div class="stat-card"><div class="stat-num">${progressData.speakingScore}%</div><div class="stat-label">Speaking</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">📈 Words Learned — Last 14 Days</div>
+      <div class="chart-wrap"><canvas id="progress-chart"></canvas></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">🎯 Skill Breakdown</div>
+      ${skills.map(s=>`
+        <div class="skill-bar-wrap">
+          <div class="skill-bar-label"><span>${s.n}</span><span>${s.v}%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:${s.v}%;background:${s.c}"></div></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">📅 Activity — Last 14 Weeks</div>
+      <div class="heatmap">
+        ${heatmap.map(v=>`<div class="heat-cell heat-${v}"></div>`).join('')}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--text-muted)">
+        Less <div class="heat-cell" style="width:12px;height:12px;display:inline-block;flex:none"></div>
+        <div class="heat-cell heat-1" style="width:12px;height:12px;display:inline-block;flex:none"></div>
+        <div class="heat-cell heat-2" style="width:12px;height:12px;display:inline-block;flex:none"></div>
+        <div class="heat-cell heat-3" style="width:12px;height:12px;display:inline-block;flex:none"></div>
+        <div class="heat-cell heat-4" style="width:12px;height:12px;display:inline-block;flex:none"></div>
+        More
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏆 Milestones</div>
+      ${milestones.map(m=>`
+        <div class="milestone ${m.done?'done':''}">
+          <div class="milestone-icon">${m.icon}</div>
+          <div>
+            <div style="font-weight:500;font-size:14px">${m.title}</div>
+            <div style="font-size:12px;color:var(--text-muted)">${m.done?'✓ Unlocked — '+m.date:'Locked — '+m.date}</div>
+          </div>
+          ${m.done?'<span class="badge badge-green" style="margin-left:auto">Done</span>':'<span class="badge badge-amber" style="margin-left:auto">Soon</span>'}
+        </div>`).join('')}
+    </div>
+  `;
+  initChart();
+}
+function initChart() {
+  setTimeout(()=>{
+    const canvas = document.getElementById('progress-chart');
+    if (!canvas) return;
+    if (progressChart) { progressChart.destroy(); progressChart=null; }
+    const labels = Array.from({length:14},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(13-i));return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
+    const data = [2,5,3,8,6,4,9,11,7,10,8,13,9,12];
+    progressChart = new Chart(canvas.getContext('2d'),{
+      type:'bar',
+      data:{
+        labels,
+        datasets:[{
+          data,
+          backgroundColor:'rgba(232,160,69,0.7)',
+          borderColor:'rgba(232,160,69,1)',
+          borderWidth:1,
+          borderRadius:4,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          y:{ticks:{color:'rgba(255,255,255,0.5)',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},beginAtZero:true},
+          x:{ticks:{color:'rgba(255,255,255,0.5)',font:{size:9}},grid:{display:false},maxRotation:45}
+        }
+      }
+    });
+  },100);
+}
+
+// ============================
+// WEB SPEECH API
+// ============================
+function speak(text, lang) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang; u.rate = 0.85; u.pitch = 1;
+  speechSynthesis.speak(u);
+}
+
+// ============================
+// EMERGENCY OVERLAY
+// ============================
+function openEmergency() {
+  const ld = LANG_DATA[currentLanguage];
+  document.getElementById('emergency-content').innerHTML = `
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Critical phrases in ${currentLanguage} — tap any to hear it</p>
+    ${ld.emergency.map(p=>`
+      <div class="phrase-card" style="border-color:rgba(232,93,93,0.3);cursor:pointer" onclick="speak('${p.n.replace(/'/g,"\\'")}','${ld.code}')">
+        <div class="phrase-native">${p.n}</div>
+        <div class="phrase-english">${p.e}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">▶ Tap to hear</div>
+      </div>`).join('')}
+    <div style="margin-top:16px;padding:14px;background:rgba(232,93,93,0.1);border-radius:10px;border:1px solid rgba(232,93,93,0.3)">
+      <div style="font-size:12px;color:var(--red);font-weight:600;margin-bottom:4px">Emergency Numbers</div>
+      <div style="font-size:13px;color:var(--text-muted)">🇺🇸 911 &nbsp;|&nbsp; 🇪🇺 112 &nbsp;|&nbsp; 🇯🇵 110/119 &nbsp;|&nbsp; 🇨🇳 110/120 &nbsp;|&nbsp; 🇻🇳 113/115</div>
+    </div>
+  `;
+  document.getElementById('emergency-overlay').classList.add('open');
+}
+function closeEmergency() { document.getElementById('emergency-overlay').classList.remove('open'); }
+
+// ============================
+// STREAK / PROGRESS UPDATE
+// ============================
+function updateStreakAndProgress() {
+  const lastDate = localStorage.getItem('ll_last_date');
+  const today = new Date().toDateString();
+  if (lastDate !== today) {
+    localStorage.setItem('ll_last_date', today);
+    const dow = (new Date().getDay()+6)%7;
+    streakData.days[dow] = 1;
+    progressData.minutesToday = Math.min(progressData.minutesToday + Math.floor(Math.random()*5+1),60);
+    progressData.wordsLearned += Math.floor(Math.random()*3);
+    localStorage.setItem('ll_streak', JSON.stringify(streakData));
+    localStorage.setItem('ll_progress', JSON.stringify(progressData));
+  }
+}
+
+// ============================
+// INIT
+// ============================
+updateStreakAndProgress();
+document.documentElement.lang = LANG_DATA[currentLanguage].code;
+renderApp();
+switchTab('home');
+
+// Auto-refresh currency every 10 min
+setInterval(()=>{ if(currentTab==='currency') initCurrency(); }, 600000);
+</script>
+</body>
+</html>
