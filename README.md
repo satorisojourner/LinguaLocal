@@ -89,7 +89,7 @@ This project auto-deploys to Vercel on every push to `main`.
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/lingua-local.git
+git clone https://github.com/satorisojourner/LinguaLocal.git
 
 # That's it — open index.html in a browser
 # or drop the repo into Vercel for instant deployment
@@ -101,7 +101,7 @@ No `npm install`. No build step. Drop and deploy.
 
 ## 📲 Install as a PWA
 
-1. Open [lingua-local.vercel.app](https://lingua-local.vercel.app) in Safari (iOS) or Chrome (Android)
+1. Open [lingua-local.vercel.app](https://lingua-local-wfkr.vercel.app) in Safari (iOS) or Chrome (Android)
 2. Tap **Share → Add to Home Screen** (iOS) or the **Install** prompt (Android/Chrome)
 3. Launch from your home screen — it runs like a native app, offline included
 
@@ -146,7 +146,7 @@ Coach names by language: Sofia (Spanish) · Hana (Japanese) · Linh (Vietnamese)
 
 ## 📄 License
 
-MIT © [Satori Sojourner](https://github.com/your-username)
+MIT © [Satori Sojourner](https://github.com/satorisojourner)
 
 ---
 
