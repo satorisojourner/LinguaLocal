@@ -4,7 +4,7 @@
 
 LinguaLocal is a zero-backend, single-file Progressive Web App (PWA) for learning a new language the way expats actually need it — phrases for housing, utilities, transport, and daily life. Built with Claude AI, deployed on Vercel, installable on any device with no App Store required.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-lingua--local.vercel.app-0f0e17?style=for-the-badge&logo=vercel&logoColor=e8a045)](https://lingua-local.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-lingua--local.vercel.app-0f0e17?style=for-the-badge&logo=vercel&logoColor=e8a045)](https://lingua-local-wfkr.vercel.app)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-8b5cf6?style=for-the-badge&logo=pwa&logoColor=white)](https://lingua-local.vercel.app)
 [![Built with Claude](https://img.shields.io/badge/Built%20with-Claude%20AI-e8a045?style=for-the-badge)](https://anthropic.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-fffffe?style=for-the-badge)](LICENSE)
